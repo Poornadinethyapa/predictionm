@@ -3,6 +3,8 @@
   margin: 0 auto;
   padding: 2rem;
   min-height: 100vh;
+  background-color: #0f172a;
+  color: #ffffff;
 }
 
 .header {
@@ -11,25 +13,26 @@
   align-items: center;
   margin-bottom: 2rem;
   padding-bottom: 1rem;
-  border-bottom: 2px solid #e5e7eb;
+  border-bottom: 2px solid #1e293b;
 }
 
 .header h1 {
-  color: #1f2937;
+  color: #ffffff;
   font-size: 2rem;
 }
 
 .card {
-  background: white;
+  background: #1e293b;
   border-radius: 8px;
   padding: 1.5rem;
   margin-bottom: 1.5rem;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+  border: 1px solid #334155;
 }
 
 .card h2 {
   margin-bottom: 1rem;
-  color: #1f2937;
+  color: #ffffff;
   font-size: 1.5rem;
 }
 
@@ -58,53 +61,365 @@
 .input {
   width: 100%;
   padding: 0.75rem;
-  border: 1px solid #d1d5db;
+  border: 1px solid #475569;
   border-radius: 6px;
   font-size: 1rem;
   margin-bottom: 1rem;
   font-family: inherit;
+  background-color: #0f172a;
+  color: #ffffff;
 }
 
 .input:focus {
   outline: none;
   border-color: #4f46e5;
-  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
+}
+
+.input::placeholder {
+  color: #64748b;
 }
 
 .label {
   display: block;
   margin-bottom: 0.5rem;
   font-weight: 500;
-  color: #374151;
+  color: #cbd5e1;
+}
+
+.marketsSection {
+  margin-top: 2rem;
+}
+
+.sectionTitle {
+  color: #ffffff;
+  font-size: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.marketsGrid {
+  display: grid;
+  gap: 1.5rem;
 }
 
 .marketCard {
-  background: #f9fafb;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  padding: 1rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1.5rem;
+  margin-bottom: 0;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.marketCard:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+}
+
+.marketHeader {
+  margin-bottom: 1.5rem;
+}
+
+.marketQuestion {
+  color: #ffffff;
+  margin-bottom: 0.75rem;
+  font-size: 1.25rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.marketMeta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.deadline {
+  color: #94a3b8;
+}
+
+.resolvedBadge {
+  background: #10b981;
+  color: #ffffff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.expiredBadge {
+  background: #ef4444;
+  color: #ffffff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.votingSection {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
   margin-bottom: 1rem;
 }
 
-.marketCard h3 {
-  color: #1f2937;
-  margin-bottom: 0.5rem;
-  font-size: 1.25rem;
+.additionalOutcomes {
+  grid-column: 1 / -1;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 1rem;
 }
 
-.marketCard p {
-  margin-bottom: 0.5rem;
-  color: #6b7280;
+.voteButton {
+  border: 2px solid;
+  border-radius: 8px;
+  padding: 1rem;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: all 0.2s;
+  position: relative;
+  overflow: hidden;
 }
 
-.marketCard ul {
-  margin-left: 1.5rem;
-  margin-top: 0.5rem;
-  margin-bottom: 0.5rem;
+.voteButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }
 
-.marketCard li {
-  margin-bottom: 0.25rem;
-  color: #4b5563;
+.yesButton {
+  background: rgba(16, 185, 129, 0.1);
+  border-color: #10b981;
+  color: #10b981;
+}
+
+.yesButton:hover:not(:disabled) {
+  background: rgba(16, 185, 129, 0.2);
+  transform: scale(1.02);
+}
+
+.noButton {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.noButton:hover:not(:disabled) {
+  background: rgba(239, 68, 68, 0.2);
+  transform: scale(1.02);
+}
+
+.additionalButton {
+  background: rgba(148, 163, 184, 0.1);
+  border-color: #94a3b8;
+  color: #94a3b8;
+}
+
+.additionalButton:hover:not(:disabled) {
+  background: rgba(148, 163, 184, 0.2);
+  transform: scale(1.02);
+}
+
+.voteButtonContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.voteLabel {
+  font-size: 1.125rem;
+  font-weight: 700;
+}
+
+.probabilityDisplay {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.probabilityValue {
+  font-size: 1.5rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.probabilityLabel {
+  font-size: 0.75rem;
+  opacity: 0.7;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stakeAmount {
+  font-size: 0.875rem;
+  opacity: 0.8;
+  margin-top: 0.25rem;
+}
+
+.userStakes {
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: rgba(148, 163, 184, 0.1);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  color: #cbd5e1;
+}
+
+.claimButton {
+  margin-top: 1rem;
+  width: 100%;
+  background: #10b981;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.claimButton:hover:not(:disabled) {
+  background: #059669;
+}
+
+.claimButton:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
+}
+
+.emptyState {
+  text-align: center;
+  padding: 3rem;
+  color: #94a3b8;
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+}
+
+.modal {
+  background: #1e293b;
+  border-radius: 12px;
+  padding: 0;
+  max-width: 500px;
+  width: 100%;
+  border: 1px solid #334155;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem;
+  border-bottom: 1px solid #334155;
+}
+
+.modalHeader h2 {
+  color: #ffffff;
+  margin: 0;
+  font-size: 1.5rem;
+}
+
+.closeButton {
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 2rem;
+  cursor: pointer;
+  padding: 0;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.closeButton:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+.modalBody {
+  padding: 1.5rem;
+}
+
+.modalQuestion {
+  color: #ffffff;
+  font-size: 1.125rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.modalOutcome {
+  color: #cbd5e1;
+  margin-bottom: 1.5rem;
+}
+
+.modalOutcome strong {
+  color: #10b981;
+}
+
+.modalActions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1.5rem;
+}
+
+.cancelButton {
+  flex: 1;
+  background: #334155;
+  color: #ffffff;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 500;
+  transition: background-color 0.2s;
+}
+
+.cancelButton:hover {
+  background: #475569;
+}
+
+.submitButton {
+  flex: 1;
+  background: #4f46e5;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.submitButton:hover:not(:disabled) {
+  background: #4338ca;
+}
+
+.submitButton:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
 }
 

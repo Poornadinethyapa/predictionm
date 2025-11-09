@@ -20,9 +20,10 @@ export default function Home() {
   const [newOutcomes, setNewOutcomes] = useState('');
   const [newDeadline, setNewDeadline] = useState('');
 
-  // Bet form state
-  const [betMarketId, setBetMarketId] = useState('');
-  const [betOutcome, setBetOutcome] = useState('');
+  // Bet modal state
+  const [betModalOpen, setBetModalOpen] = useState(false);
+  const [selectedMarket, setSelectedMarket] = useState(null);
+  const [selectedOutcome, setSelectedOutcome] = useState(null);
   const [betAmount, setBetAmount] = useState('');
 
   // Resolve form state
@@ -112,18 +113,41 @@ export default function Home() {
     }
   };
 
+  const openBetModal = (marketId, outcomeIndex) => {
+    if (!marketId && marketId !== 0) return;
+    const market = markets.find(m => m.id === marketId);
+    if (!market || market.resolved) return;
+    if (new Date(market.deadline * 1000) < new Date()) {
+      alert('This market has passed its deadline.');
+      return;
+    }
+    setSelectedMarket(market);
+    setSelectedOutcome(outcomeIndex);
+    setBetAmount('');
+    setBetModalOpen(true);
+  };
+
+  const closeBetModal = () => {
+    setBetModalOpen(false);
+    setSelectedMarket(null);
+    setSelectedOutcome(null);
+    setBetAmount('');
+  };
+
   const placeBet = async (e) => {
     e.preventDefault();
-    if (!contract || !signer) return;
+    if (!contract || !signer || selectedMarket === null || selectedOutcome === null) return;
+    if (!betAmount || parseFloat(betAmount) <= 0) {
+      alert('Please enter a valid bet amount');
+      return;
+    }
     setLoading(true);
     try {
       const amount = ethers.utils.parseEther(betAmount);
-      const tx = await contract.placeBet(betMarketId, betOutcome, { value: amount });
+      const tx = await contract.placeBet(selectedMarket.id, selectedOutcome, { value: amount });
       await tx.wait();
       
-      setBetMarketId('');
-      setBetOutcome('');
-      setBetAmount('');
+      closeBetModal();
       await loadMarkets();
       alert('Bet placed successfully!');
     } catch (err) {
@@ -132,6 +156,11 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const calculateProbability = (stake, totalStake) => {
+    if (parseFloat(totalStake) === 0) return 50; // Default to 50% if no stakes
+    return ((parseFloat(stake) / parseFloat(totalStake)) * 100).toFixed(1);
   };
 
   const resolveMarket = async (e) => {
@@ -206,7 +235,7 @@ export default function Home() {
                 />
               </div>
               <div>
-                <label className={styles.label}>Outcomes (comma-separated)</label>
+                <label className={styles.label}>Outcomes (comma-separated, e.g., "Yes, No")</label>
                 <input
                   type="text"
                   className={styles.input}
@@ -215,6 +244,9 @@ export default function Home() {
                   placeholder="Yes, No"
                   required
                 />
+                <small style={{ color: '#94a3b8', fontSize: '0.875rem' }}>
+                  Note: The UI is optimized for Yes/No markets. Other outcomes will still work but may not display optimally.
+                </small>
               </div>
               <div>
                 <label className={styles.label}>Deadline</label>
@@ -232,48 +264,6 @@ export default function Home() {
             </form>
           </div>
 
-          {/* Place Bet Section */}
-          <div className={styles.card}>
-            <h2>Place Bet</h2>
-            <form onSubmit={placeBet}>
-              <div>
-                <label className={styles.label}>Market ID</label>
-                <input
-                  type="number"
-                  className={styles.input}
-                  value={betMarketId}
-                  onChange={(e) => setBetMarketId(e.target.value)}
-                  placeholder="0"
-                  required
-                />
-              </div>
-              <div>
-                <label className={styles.label}>Outcome Index</label>
-                <input
-                  type="number"
-                  className={styles.input}
-                  value={betOutcome}
-                  onChange={(e) => setBetOutcome(e.target.value)}
-                  placeholder="0"
-                  required
-                />
-              </div>
-              <div>
-                <label className={styles.label}>Amount (ETH)</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  value={betAmount}
-                  onChange={(e) => setBetAmount(e.target.value)}
-                  placeholder="0.1"
-                  required
-                />
-              </div>
-              <button type="submit" className={styles.button} disabled={loading}>
-                Place Bet
-              </button>
-            </form>
-          </div>
 
           {/* Resolve Market Section */}
           <div className={styles.card}>
@@ -308,53 +298,168 @@ export default function Home() {
           </div>
 
           {/* Markets List */}
-          <div className={styles.card}>
-            <h2>Markets ({marketCount})</h2>
+          <div className={styles.marketsSection}>
+            <h2 className={styles.sectionTitle}>Markets ({marketCount})</h2>
             {markets.length === 0 ? (
-              <p>No markets created yet.</p>
+              <div className={styles.emptyState}>
+                <p>No markets created yet.</p>
+              </div>
             ) : (
-              markets.map((market) => (
-                <div key={market.id} className={styles.marketCard}>
-                  <h3>Market #{market.id}: {market.question}</h3>
-                  <p><strong>Owner:</strong> {market.owner}</p>
-                  <p><strong>Deadline:</strong> {formatDate(market.deadline)}</p>
-                  <p><strong>Status:</strong> {market.resolved ? `Resolved - Winner: ${market.outcomes[market.winningOutcome]}` : 'Active'}</p>
-                  <p><strong>Total Staked:</strong> {market.totalStaked} ETH</p>
-                  <div>
-                    <strong>Outcomes:</strong>
-                    <ul>
-                      {market.outcomes.map((outcome, idx) => (
-                        <li key={idx}>
-                          {outcome}: {market.outcomeStakes[idx]} ETH
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  {market.resolved && address && userStakes[market.id] && 
-                   parseFloat(userStakes[market.id][market.winningOutcome] || '0') > 0 && (
-                    <button
-                      onClick={() => claimWinnings(market.id)}
-                      className={styles.button}
-                      disabled={loading}
-                    >
-                      Claim Winnings ({userStakes[market.id][market.winningOutcome]} ETH staked)
-                    </button>
-                  )}
-                  {address && userStakes[market.id] && (
-                    <div style={{ marginTop: '0.5rem', fontSize: '0.875rem', color: '#6b7280' }}>
-                      <strong>Your stakes:</strong>{' '}
-                      {market.outcomes.map((outcome, idx) => (
-                        <span key={idx}>
-                          {outcome}: {userStakes[market.id][idx] || '0'} ETH
-                          {idx < market.outcomes.length - 1 ? ', ' : ''}
-                        </span>
-                      ))}
+              <div className={styles.marketsGrid}>
+                {markets.map((market) => {
+                  const isExpired = new Date(market.deadline * 1000) < new Date();
+                  const canBet = !market.resolved && !isExpired;
+                  const yesStake = parseFloat(market.outcomeStakes[0] || '0');
+                  const noStake = parseFloat(market.outcomeStakes[1] || '0');
+                  const totalStake = parseFloat(market.totalStaked || '0');
+                  const yesProbability = calculateProbability(yesStake, totalStake);
+                  const noProbability = calculateProbability(noStake, totalStake);
+
+                  return (
+                    <div key={market.id} className={styles.marketCard}>
+                      <div className={styles.marketHeader}>
+                        <h3 className={styles.marketQuestion}>{market.question}</h3>
+                        <div className={styles.marketMeta}>
+                          <span className={styles.deadline}>Deadline: {formatDate(market.deadline)}</span>
+                          {market.resolved && (
+                            <span className={styles.resolvedBadge}>Resolved: {market.outcomes[market.winningOutcome]}</span>
+                          )}
+                          {isExpired && !market.resolved && (
+                            <span className={styles.expiredBadge}>Expired</span>
+                          )}
+                        </div>
+                      </div>
+
+                      <div className={styles.votingSection}>
+                        {/* Outcome Buttons - Show first 2 outcomes as Yes/No style */}
+                        {market.outcomes.length >= 2 && (
+                          <>
+                            <button
+                              className={`${styles.voteButton} ${styles.yesButton}`}
+                              onClick={() => canBet && openBetModal(market.id, 0)}
+                              disabled={!canBet || loading}
+                            >
+                              <div className={styles.voteButtonContent}>
+                                <span className={styles.voteLabel}>{market.outcomes[0]}</span>
+                                <div className={styles.probabilityDisplay}>
+                                  <span className={styles.probabilityValue}>{yesProbability}%</span>
+                                  <span className={styles.probabilityLabel}>chance</span>
+                                </div>
+                                <div className={styles.stakeAmount}>{yesStake.toFixed(4)} ETH</div>
+                              </div>
+                            </button>
+
+                            <button
+                              className={`${styles.voteButton} ${styles.noButton}`}
+                              onClick={() => canBet && openBetModal(market.id, 1)}
+                              disabled={!canBet || loading}
+                            >
+                              <div className={styles.voteButtonContent}>
+                                <span className={styles.voteLabel}>{market.outcomes[1]}</span>
+                                <div className={styles.probabilityDisplay}>
+                                  <span className={styles.probabilityValue}>{noProbability}%</span>
+                                  <span className={styles.probabilityLabel}>chance</span>
+                                </div>
+                                <div className={styles.stakeAmount}>{noStake.toFixed(4)} ETH</div>
+                              </div>
+                            </button>
+                          </>
+                        )}
+                        {/* Fallback for markets with more than 2 outcomes */}
+                        {market.outcomes.length > 2 && (
+                          <div className={styles.additionalOutcomes}>
+                            {market.outcomes.slice(2).map((outcome, idx) => {
+                              const outcomeIndex = idx + 2;
+                              const stake = parseFloat(market.outcomeStakes[outcomeIndex] || '0');
+                              const probability = calculateProbability(stake, totalStake);
+                              return (
+                                <button
+                                  key={outcomeIndex}
+                                  className={`${styles.voteButton} ${styles.additionalButton}`}
+                                  onClick={() => canBet && openBetModal(market.id, outcomeIndex)}
+                                  disabled={!canBet || loading}
+                                >
+                                  <div className={styles.voteButtonContent}>
+                                    <span className={styles.voteLabel}>{outcome}</span>
+                                    <div className={styles.probabilityDisplay}>
+                                      <span className={styles.probabilityValue}>{probability}%</span>
+                                      <span className={styles.probabilityLabel}>chance</span>
+                                    </div>
+                                    <div className={styles.stakeAmount}>{stake.toFixed(4)} ETH</div>
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        )}
+                      </div>
+
+                      {address && userStakes[market.id] && market.outcomes.map((outcome, idx) => 
+                        parseFloat(userStakes[market.id][idx] || '0') > 0
+                      ).some(Boolean) && (
+                        <div className={styles.userStakes}>
+                          <strong>Your stakes:</strong>{' '}
+                          {market.outcomes.map((outcome, idx) => 
+                            parseFloat(userStakes[market.id][idx] || '0') > 0 ? (
+                              <span key={idx}>{outcome}: {userStakes[market.id][idx]} ETH </span>
+                            ) : null
+                          )}
+                        </div>
+                      )}
+
+                      {market.resolved && address && userStakes[market.id] && 
+                       parseFloat(userStakes[market.id][market.winningOutcome] || '0') > 0 && (
+                        <button
+                          onClick={() => claimWinnings(market.id)}
+                          className={styles.claimButton}
+                          disabled={loading}
+                        >
+                          Claim Winnings
+                        </button>
+                      )}
                     </div>
-                  )}
-                </div>
-              ))
+                  );
+                })}
+              </div>
             )}
           </div>
+
+          {/* Bet Modal */}
+          {betModalOpen && selectedMarket && selectedOutcome !== null && (
+            <div className={styles.modalOverlay} onClick={closeBetModal}>
+              <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.modalHeader}>
+                  <h2>Place Bet</h2>
+                  <button className={styles.closeButton} onClick={closeBetModal}>×</button>
+                </div>
+                <div className={styles.modalBody}>
+                  <p className={styles.modalQuestion}>{selectedMarket.question}</p>
+                  <p className={styles.modalOutcome}>You're betting on: <strong>{selectedMarket.outcomes[selectedOutcome]}</strong></p>
+                  <form onSubmit={placeBet}>
+                    <label className={styles.label}>Amount (ETH)</label>
+                    <input
+                      type="number"
+                      className={styles.input}
+                      value={betAmount}
+                      onChange={(e) => setBetAmount(e.target.value)}
+                      placeholder="0.1"
+                      step="0.001"
+                      min="0.001"
+                      required
+                    />
+                    <div className={styles.modalActions}>
+                      <button type="button" className={styles.cancelButton} onClick={closeBetModal}>
+                        Cancel
+                      </button>
+                      <button type="submit" className={styles.submitButton} disabled={loading}>
+                        {loading ? 'Placing Bet...' : 'Place Bet'}
+                      </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
         </>
       )}
     </div>
