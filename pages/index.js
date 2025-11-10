@@ -208,6 +208,7 @@ export default function Home() {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1>Predict & Win</h1>
+        <ConnectButton />
       </header>
 
       {!isConnected && (
