@@ -80,6 +80,16 @@
   color: #64748b;
 }
 
+select.input {
+  cursor: pointer;
+}
+
+select.input option {
+  background-color: #1e293b;
+  color: #ffffff;
+  padding: 0.5rem;
+}
+
 .label {
   display: block;
   margin-bottom: 0.5rem;
@@ -267,6 +277,29 @@
   border-radius: 6px;
   font-size: 0.875rem;
   color: #cbd5e1;
+}
+
+.resolveButton {
+  margin-top: 1rem;
+  width: 100%;
+  background: #f59e0b;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 1rem;
+  font-weight: 600;
+  transition: background-color 0.2s;
+}
+
+.resolveButton:hover:not(:disabled) {
+  background: #d97706;
+}
+
+.resolveButton:disabled {
+  background: #6b7280;
+  cursor: not-allowed;
 }
 
 .claimButton {

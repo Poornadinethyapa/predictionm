@@ -266,33 +266,84 @@ export default function Home() {
 
 
           {/* Resolve Market Section */}
-          <div className={styles.card}>
+          <div id="resolve-section" className={styles.card}>
             <h2>Resolve Market (Owner Only)</h2>
+            <p style={{ color: '#94a3b8', marginBottom: '1rem', fontSize: '0.875rem' }}>
+              Select a market you own that has passed its deadline to resolve it.
+            </p>
             <form onSubmit={resolveMarket}>
               <div>
-                <label className={styles.label}>Market ID</label>
-                <input
-                  type="number"
+                <label className={styles.label}>Select Market</label>
+                <select
                   className={styles.input}
                   value={resolveMarketId}
-                  onChange={(e) => setResolveMarketId(e.target.value)}
-                  placeholder="0"
+                  onChange={(e) => {
+                    setResolveMarketId(e.target.value);
+                    setResolveOutcome(''); // Reset outcome when market changes
+                  }}
                   required
-                />
+                >
+                  <option value="">-- Select a market --</option>
+                  {markets
+                    .filter(market => 
+                      market.owner.toLowerCase() === address?.toLowerCase() && 
+                      !market.resolved &&
+                      new Date(market.deadline * 1000) < new Date()
+                    )
+                    .map(market => (
+                      <option key={market.id} value={market.id}>
+                        Market #{market.id}: {market.question} (Deadline: {formatDate(market.deadline)})
+                      </option>
+                    ))}
+                </select>
+                {markets.filter(m => 
+                  m.owner.toLowerCase() === address?.toLowerCase() && 
+                  !m.resolved &&
+                  new Date(m.deadline * 1000) < new Date()
+                ).length === 0 && (
+                  <p style={{ color: '#94a3b8', fontSize: '0.875rem', marginTop: '0.5rem' }}>
+                    No markets available to resolve. You need to own a market that has passed its deadline.
+                  </p>
+                )}
               </div>
-              <div>
-                <label className={styles.label}>Winning Outcome Index</label>
-                <input
-                  type="number"
-                  className={styles.input}
-                  value={resolveOutcome}
-                  onChange={(e) => setResolveOutcome(e.target.value)}
-                  placeholder="0"
-                  required
-                />
-              </div>
-              <button type="submit" className={styles.button} disabled={loading}>
-                Resolve Market
+              {resolveMarketId && (() => {
+                const selectedMarket = markets.find(m => m.id.toString() === resolveMarketId);
+                if (!selectedMarket) return null;
+                return (
+                  <div>
+                    <label className={styles.label}>Select Winning Outcome</label>
+                    <select
+                      className={styles.input}
+                      value={resolveOutcome}
+                      onChange={(e) => setResolveOutcome(e.target.value)}
+                      required
+                    >
+                      <option value="">-- Select winning outcome --</option>
+                      {selectedMarket.outcomes.map((outcome, idx) => (
+                        <option key={idx} value={idx}>
+                          {outcome} (Index: {idx})
+                        </option>
+                      ))}
+                    </select>
+                    <div style={{ marginTop: '0.75rem', padding: '0.75rem', background: 'rgba(148, 163, 184, 0.1)', borderRadius: '6px', fontSize: '0.875rem', color: '#cbd5e1' }}>
+                      <strong>Market Details:</strong>
+                      <ul style={{ marginTop: '0.5rem', marginLeft: '1.5rem' }}>
+                        <li>Question: {selectedMarket.question}</li>
+                        <li>Deadline: {formatDate(selectedMarket.deadline)}</li>
+                        <li>Total Staked: {selectedMarket.totalStaked} ETH</li>
+                        <li>Outcomes: {selectedMarket.outcomes.join(', ')}</li>
+                      </ul>
+                    </div>
+                  </div>
+                );
+              })()}
+              <button 
+                type="submit" 
+                className={styles.button} 
+                disabled={loading || !resolveMarketId || !resolveOutcome}
+                style={{ marginTop: '1rem' }}
+              >
+                {loading ? 'Resolving...' : 'Resolve Market'}
               </button>
             </form>
           </div>
@@ -405,6 +456,24 @@ export default function Home() {
                             ) : null
                           )}
                         </div>
+                      )}
+
+                      {/* Resolve button for market owner */}
+                      {!market.resolved && 
+                       address && 
+                       market.owner.toLowerCase() === address.toLowerCase() &&
+                       new Date(market.deadline * 1000) < new Date() && (
+                        <button
+                          onClick={() => {
+                            setResolveMarketId(market.id.toString());
+                            // Scroll to resolve section
+                            document.getElementById('resolve-section')?.scrollIntoView({ behavior: 'smooth' });
+                          }}
+                          className={styles.resolveButton}
+                          disabled={loading}
+                        >
+                          Resolve This Market
+                        </button>
                       )}
 
                       {market.resolved && address && userStakes[market.id] && 
