@@ -212,8 +212,102 @@ export default function Home() {
       </header>
 
       {!isConnected && (
-        <div className={styles.card}>
-          <p>Please connect your wallet to continue.</p>
+        <div className={styles.landingPage}>
+          {/* Hero Section */}
+          <section className={styles.hero}>
+            <h1 className={styles.heroTitle}>Predict & Win</h1>
+            <p className={styles.heroSubtitle}>
+              A decentralized prediction market platform built on Base Sepolia
+            </p>
+            <p className={styles.heroDescription}>
+              Create markets, place bets, and win rewards based on real-world outcomes. 
+              Powered by smart contracts for transparent and trustless predictions.
+            </p>
+            <div className={styles.ctaSection}>
+              <ConnectButton />
+            </div>
+          </section>
+
+          {/* Features Section */}
+          <section className={styles.features}>
+            <h2 className={styles.featuresTitle}>Features</h2>
+            <div className={styles.featuresGrid}>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>📊</div>
+                <h3 className={styles.featureTitle}>Create Markets</h3>
+                <p className={styles.featureDescription}>
+                  Create prediction markets on any topic. Set questions, outcomes, and deadlines.
+                </p>
+              </div>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>💰</div>
+                <h3 className={styles.featureTitle}>Place Bets</h3>
+                <p className={styles.featureDescription}>
+                  Bet ETH on outcomes you believe will happen. See real-time probability updates.
+                </p>
+              </div>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>🏆</div>
+                <h3 className={styles.featureTitle}>Win Rewards</h3>
+                <p className={styles.featureDescription}>
+                  Winners receive proportional payouts based on their stake and the total pool.
+                </p>
+              </div>
+              <div className={styles.featureCard}>
+                <div className={styles.featureIcon}>🔒</div>
+                <h3 className={styles.featureTitle}>Decentralized</h3>
+                <p className={styles.featureDescription}>
+                  Built on blockchain for transparency, security, and trustless execution.
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* How It Works Section */}
+          <section className={styles.howItWorks}>
+            <h2 className={styles.sectionTitle}>How It Works</h2>
+            <div className={styles.steps}>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>1</div>
+                <h3 className={styles.stepTitle}>Connect Wallet</h3>
+                <p className={styles.stepDescription}>
+                  Connect your MetaMask or other Web3 wallet to get started
+                </p>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>2</div>
+                <h3 className={styles.stepTitle}>Create or Browse Markets</h3>
+                <p className={styles.stepDescription}>
+                  Create your own prediction market or browse existing markets
+                </p>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>3</div>
+                <h3 className={styles.stepTitle}>Place Your Bet</h3>
+                <p className={styles.stepDescription}>
+                  Choose an outcome and bet ETH. Watch probabilities update in real-time
+                </p>
+              </div>
+              <div className={styles.step}>
+                <div className={styles.stepNumber}>4</div>
+                <h3 className={styles.stepTitle}>Claim Winnings</h3>
+                <p className={styles.stepDescription}>
+                  After market resolution, winners can claim their proportional rewards
+                </p>
+              </div>
+            </div>
+          </section>
+
+          {/* CTA Section */}
+          <section className={styles.finalCta}>
+            <h2 className={styles.ctaTitle}>Ready to Start Predicting?</h2>
+            <p className={styles.ctaDescription}>
+              Connect your wallet and join the prediction market revolution
+            </p>
+            <div className={styles.ctaButtonWrapper}>
+              <ConnectButton />
+            </div>
+          </section>
         </div>
       )}
 
