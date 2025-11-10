@@ -208,7 +208,6 @@ export default function Home() {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1>Predict & Win</h1>
-        <ConnectButton />
       </header>
 
       {!isConnected && (
@@ -224,7 +223,9 @@ export default function Home() {
               Powered by smart contracts for transparent and trustless predictions.
             </p>
             <div className={styles.ctaSection}>
-              <ConnectButton />
+              <div className={styles.ctaHighlight}>
+                <ConnectButton />
+              </div>
             </div>
           </section>
 
