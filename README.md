@@ -1,11 +1,11 @@
-# Predict & Win — Polymarket-style Template
+# Predict & Win on Base
 
-This repository is a ready-to-deploy template for a simple Polymarket-like prediction market. It contains a Solidity contract and a Next.js frontend. The contract supports multiple outcomes, market creation, betting with ETH, resolution by market owner, and proportional payout to winners.
+This repository is a ready-to-deploy template for a simple prediction market. It contains a Solidity contract and a Next.js frontend. The contract supports multiple outcomes, market creation, betting with ETH, resolution by market owner, and proportional payout to winners.
 
 ## Project structure
 
 ```
-predict-and-win-polymarket/
+predict-and-win/
 ├─ contracts/
 │  └─ PredictionMarket.sol
 ├─ pages/
