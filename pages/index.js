@@ -207,7 +207,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1>Predict & Win — Polymarket-style</h1>
+        <h1>Predict & Win</h1>
         <ConnectButton />
       </header>
 
