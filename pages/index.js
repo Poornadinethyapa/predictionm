@@ -709,8 +709,8 @@ export default function Home() {
                       </div>
 
                       <div className={styles.votingSection}>
-                        {/* Outcome Buttons - Show first 2 outcomes as Yes/No style */}
-                        {market.outcomes.length >= 2 && (
+                        {/* Outcome Buttons - Show first 2 outcomes as Yes/No style only if exactly 2 outcomes */}
+                        {market.outcomes.length === 2 && (
                           <>
                             <button
                               className={`${styles.voteButton} ${styles.yesButton}`}
@@ -743,18 +743,17 @@ export default function Home() {
                             </button>
                           </>
                         )}
-                        {/* Fallback for markets with more than 2 outcomes */}
+                        {/* For markets with more than 2 outcomes, use neutral colors */}
                         {market.outcomes.length > 2 && (
-                          <div className={styles.additionalOutcomes}>
-                            {market.outcomes.slice(2).map((outcome, idx) => {
-                              const outcomeIndex = idx + 2;
-                              const stake = parseFloat(market.outcomeStakes[outcomeIndex] || '0');
+                          <div className={styles.multipleOutcomes}>
+                            {market.outcomes.map((outcome, idx) => {
+                              const stake = parseFloat(market.outcomeStakes[idx] || '0');
                               const probability = calculateProbability(stake, totalStake);
                               return (
                                 <button
-                                  key={outcomeIndex}
+                                  key={idx}
                                   className={`${styles.voteButton} ${styles.additionalButton}`}
-                                  onClick={() => canBet && openBetModal(market.id, outcomeIndex)}
+                                  onClick={() => canBet && openBetModal(market.id, idx)}
                                   disabled={!canBet || loading}
                                 >
                                   <div className={styles.voteButtonContent}>
