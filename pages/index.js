@@ -207,7 +207,7 @@ export default function Home() {
   return (
     <div className={styles.container}>
       <header className={styles.header}>
-        <h1>Predict & Win</h1>
+        <h1>Truecast</h1>
         <ConnectButton />
       </header>
 
@@ -215,7 +215,7 @@ export default function Home() {
         <div className={styles.landingPage}>
           {/* Hero Section */}
           <section className={styles.hero}>
-            <h1 className={styles.heroTitle}>Predict & Win</h1>
+            <h1 className={styles.heroTitle}>Truecast</h1>
             <p className={styles.heroSubtitle}>
               A decentralized prediction market platform built on Base Sepolia
             </p>

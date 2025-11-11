@@ -1,4 +1,4 @@
-# Predict & Win on Base
+# Truecast on Base
 
 This repository is a ready-to-deploy template for a simple prediction market. It contains a Solidity contract and a Next.js frontend. The contract supports multiple outcomes, market creation, betting with ETH, resolution by market owner, and proportional payout to winners.
 

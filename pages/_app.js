@@ -29,7 +29,7 @@ const baseSepolia = {
 };
 
 const { chains, provider } = configureChains([baseSepolia], [publicProvider()]);
-const { connectors } = getDefaultWallets({ appName: 'Predict & Win', chains });
+const { connectors } = getDefaultWallets({ appName: 'Truecast', chains });
 const wagmiClient = createClient({ autoConnect: true, connectors, provider });
 
 export default function App({ Component, pageProps }) {
