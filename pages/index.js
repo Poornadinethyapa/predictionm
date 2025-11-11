@@ -14,6 +14,7 @@ export default function Home() {
   const [markets, setMarkets] = useState([]);
   const [loading, setLoading] = useState(false);
   const [userStakes, setUserStakes] = useState({});
+  const [activeFilter, setActiveFilter] = useState('all'); // 'all', 'myBets', 'myMarkets'
 
   // Create market form state
   const [newQuestion, setNewQuestion] = useState('');
@@ -198,6 +199,74 @@ export default function Home() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const claimAllWinnings = async () => {
+    if (!contract || !signer || !address) return;
+    setLoading(true);
+    try {
+      const claimableMarkets = markets.filter(market => {
+        if (!market.resolved) return false;
+        if (!userStakes[market.id]) return false;
+        const stake = parseFloat(userStakes[market.id][market.winningOutcome] || '0');
+        return stake > 0;
+      });
+
+      if (claimableMarkets.length === 0) {
+        alert('No winnings to claim!');
+        setLoading(false);
+        return;
+      }
+
+      // Claim winnings for each market
+      for (const market of claimableMarkets) {
+        try {
+          const tx = await contract.claim(market.id);
+          await tx.wait();
+        } catch (err) {
+          console.error(`Error claiming market ${market.id}:`, err);
+          // Continue with other markets even if one fails
+        }
+      }
+
+      await loadMarkets();
+      alert(`Successfully claimed winnings from ${claimableMarkets.length} market(s)!`);
+    } catch (err) {
+      console.error('Error claiming all winnings:', err);
+      alert('Error claiming winnings: ' + (err.message || err));
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const getFilteredMarkets = () => {
+    if (!address) return markets;
+    
+    switch (activeFilter) {
+      case 'myBets':
+        return markets.filter(market => {
+          if (!userStakes[market.id]) return false;
+          return market.outcomes.some((_, idx) => 
+            parseFloat(userStakes[market.id][idx] || '0') > 0
+          );
+        });
+      case 'myMarkets':
+        return markets.filter(market => 
+          market.owner.toLowerCase() === address.toLowerCase()
+        );
+      default:
+        return markets;
+    }
+  };
+
+  const getClaimableCount = () => {
+    if (!address) return 0;
+    return markets.filter(market => {
+      if (!market.resolved) return false;
+      if (!userStakes[market.id]) return false;
+      const stake = parseFloat(userStakes[market.id][market.winningOutcome] || '0');
+      return stake > 0;
+    }).length;
   };
 
   const formatDate = (timestamp) => {
@@ -444,16 +513,64 @@ export default function Home() {
             </form>
           </div>
 
+          {/* Quick Actions */}
+          <div className={styles.quickActions}>
+            <div className={styles.filterTabs}>
+              <button
+                className={`${styles.filterTab} ${activeFilter === 'all' ? styles.activeTab : ''}`}
+                onClick={() => setActiveFilter('all')}
+              >
+                All Markets ({marketCount})
+              </button>
+              <button
+                className={`${styles.filterTab} ${activeFilter === 'myBets' ? styles.activeTab : ''}`}
+                onClick={() => setActiveFilter('myBets')}
+              >
+                My Bets ({markets.filter(m => {
+                  if (!userStakes[m.id]) return false;
+                  return m.outcomes.some((_, idx) => 
+                    parseFloat(userStakes[m.id][idx] || '0') > 0
+                  );
+                }).length})
+              </button>
+              <button
+                className={`${styles.filterTab} ${activeFilter === 'myMarkets' ? styles.activeTab : ''}`}
+                onClick={() => setActiveFilter('myMarkets')}
+              >
+                My Markets ({markets.filter(m => 
+                  m.owner.toLowerCase() === address?.toLowerCase()
+                ).length})
+              </button>
+            </div>
+            {getClaimableCount() > 0 && (
+              <button
+                className={styles.claimAllButton}
+                onClick={claimAllWinnings}
+                disabled={loading}
+              >
+                Claim All Winnings ({getClaimableCount()})
+              </button>
+            )}
+          </div>
+
           {/* Markets List */}
           <div className={styles.marketsSection}>
-            <h2 className={styles.sectionTitle}>Markets ({marketCount})</h2>
-            {markets.length === 0 ? (
+            <h2 className={styles.sectionTitle}>
+              {activeFilter === 'all' && `Markets (${marketCount})`}
+              {activeFilter === 'myBets' && `My Bets (${getFilteredMarkets().length})`}
+              {activeFilter === 'myMarkets' && `My Markets (${getFilteredMarkets().length})`}
+            </h2>
+            {getFilteredMarkets().length === 0 ? (
               <div className={styles.emptyState}>
-                <p>No markets created yet.</p>
+                <p>
+                  {activeFilter === 'all' && 'No markets created yet.'}
+                  {activeFilter === 'myBets' && 'You haven\'t placed any bets yet.'}
+                  {activeFilter === 'myMarkets' && 'You haven\'t created any markets yet.'}
+                </p>
               </div>
             ) : (
               <div className={styles.marketsGrid}>
-                {markets.map((market) => {
+                {getFilteredMarkets().map((market) => {
                   const isExpired = new Date(market.deadline * 1000) < new Date();
                   const canBet = !market.resolved && !isExpired;
                   const yesStake = parseFloat(market.outcomeStakes[0] || '0');
