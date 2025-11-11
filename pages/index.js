@@ -269,6 +269,73 @@ export default function Home() {
     }).length;
   };
 
+  const getUserStats = () => {
+    if (!address) return null;
+
+    // Markets created
+    const marketsCreated = markets.filter(m => 
+      m.owner.toLowerCase() === address.toLowerCase()
+    ).length;
+
+    // Markets where user has bets
+    const marketsWithBets = markets.filter(m => {
+      if (!userStakes[m.id]) return false;
+      return m.outcomes.some((_, idx) => 
+        parseFloat(userStakes[m.id][idx] || '0') > 0
+      );
+    });
+
+    // Markets won (resolved markets where user bet on winning outcome)
+    const marketsWon = markets.filter(m => {
+      if (!m.resolved) return false;
+      if (!userStakes[m.id]) return false;
+      const stake = parseFloat(userStakes[m.id][m.winningOutcome] || '0');
+      return stake > 0;
+    }).length;
+
+    // Markets lost (resolved markets where user bet on losing outcome)
+    const marketsLost = markets.filter(m => {
+      if (!m.resolved) return false;
+      if (!userStakes[m.id]) return false;
+      const winningStake = parseFloat(userStakes[m.id][m.winningOutcome] || '0');
+      const hasLosingStake = m.outcomes.some((_, idx) => {
+        if (idx === m.winningOutcome) return false;
+        return parseFloat(userStakes[m.id][idx] || '0') > 0;
+      });
+      return winningStake === 0 && hasLosingStake;
+    }).length;
+
+    // Calculate win rate
+    const totalResolvedBets = marketsWon + marketsLost;
+    const winRate = totalResolvedBets > 0 
+      ? ((marketsWon / totalResolvedBets) * 100).toFixed(1)
+      : '0.0';
+
+    // Calculate total earnings (sum of all winning stakes)
+    let totalEarnings = 0;
+    markets.forEach(m => {
+      if (m.resolved && userStakes[m.id]) {
+        const stake = parseFloat(userStakes[m.id][m.winningOutcome] || '0');
+        if (stake > 0) {
+          // Calculate potential earnings (stake + proportional share of loser pool)
+          const totalWinningStake = parseFloat(m.outcomeStakes[m.winningOutcome] || '0');
+          const totalStake = parseFloat(m.totalStaked || '0');
+          const loserPool = totalStake - totalWinningStake;
+          const payout = stake + (loserPool * stake) / totalWinningStake;
+          totalEarnings += payout;
+        }
+      }
+    });
+
+    return {
+      winRate,
+      totalEarnings: totalEarnings.toFixed(4),
+      marketsCreated,
+      marketsWon,
+      totalResolvedBets
+    };
+  };
+
   const formatDate = (timestamp) => {
     return new Date(timestamp * 1000).toLocaleString();
   };
@@ -384,6 +451,41 @@ export default function Home() {
 
       {isConnected && (
         <>
+          {/* User Profile Stats */}
+          {getUserStats() && (
+            <div className={styles.userStatsSection}>
+              <h2 className={styles.statsTitle}>Your Stats</h2>
+              <div className={styles.statsGrid}>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>📊</div>
+                  <div className={styles.statValue}>{getUserStats().winRate}%</div>
+                  <div className={styles.statLabel}>Win Rate</div>
+                  <div className={styles.statSubtext}>
+                    {getUserStats().totalResolvedBets} resolved bet{getUserStats().totalResolvedBets !== 1 ? 's' : ''}
+                  </div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>💰</div>
+                  <div className={styles.statValue}>{getUserStats().totalEarnings}</div>
+                  <div className={styles.statLabel}>Total Earnings (ETH)</div>
+                  <div className={styles.statSubtext}>From winning bets</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>📝</div>
+                  <div className={styles.statValue}>{getUserStats().marketsCreated}</div>
+                  <div className={styles.statLabel}>Markets Created</div>
+                  <div className={styles.statSubtext}>Your prediction markets</div>
+                </div>
+                <div className={styles.statCard}>
+                  <div className={styles.statIcon}>🏆</div>
+                  <div className={styles.statValue}>{getUserStats().marketsWon}</div>
+                  <div className={styles.statLabel}>Markets Won</div>
+                  <div className={styles.statSubtext}>Successful predictions</div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {/* Create Market Section */}
           <div className={styles.card}>
             <h2>Create New Market</h2>
