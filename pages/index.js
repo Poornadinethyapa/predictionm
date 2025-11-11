@@ -337,7 +337,16 @@ export default function Home() {
   };
 
   const formatDate = (timestamp) => {
-    return new Date(timestamp * 1000).toLocaleString();
+    const date = new Date(timestamp * 1000);
+    return date.toLocaleString('en-US', { 
+      timeZone: 'UTC',
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: false
+    }) + ' UTC';
   };
 
   return (
@@ -516,7 +525,7 @@ export default function Home() {
                 </small>
               </div>
               <div>
-                <label className={styles.label}>Deadline</label>
+                <label className={styles.label}>Deadline (UTC)</label>
                 <input
                   type="datetime-local"
                   className={styles.input}
@@ -524,6 +533,9 @@ export default function Home() {
                   onChange={(e) => setNewDeadline(e.target.value)}
                   required
                 />
+                <small style={{ color: '#94a3b8', fontSize: '0.875rem', display: 'block', marginTop: '0.25rem' }}>
+                  All times are displayed in UTC timezone
+                </small>
               </div>
               <button type="submit" className={styles.button} disabled={loading}>
                 Create Market
