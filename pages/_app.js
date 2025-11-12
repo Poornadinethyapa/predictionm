@@ -39,6 +39,8 @@ export default function App({ Component, pageProps }) {
       <Head>
         <title>Truecast - Decentralized Prediction Markets</title>
         <meta name="description" content="A decentralized prediction market platform built on Base Sepolia" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes" />
+        <meta name="theme-color" content="#0f172a" />
         <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
         <link rel="alternate icon" href="/favicon.svg" />
       </Head>

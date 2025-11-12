@@ -881,6 +881,424 @@ select.input option {
   margin-bottom: 1rem;
 }
 
+/* Mobile Optimizations */
+@media (max-width: 768px) {
+  .container {
+    padding: 1rem;
+  }
+
+  .header {
+    padding: 1rem;
+    flex-direction: column;
+    gap: 1rem;
+    align-items: flex-start;
+  }
+
+  .header h1 {
+    font-size: 1.5rem;
+  }
+
+  .card {
+    padding: 1rem;
+    margin-bottom: 1rem;
+  }
+
+  .card h2 {
+    font-size: 1.25rem;
+  }
+
+  /* Touch-friendly buttons - minimum 44x44px */
+  .button,
+  .claimButton,
+  .resolveButton,
+  .submitButton,
+  .cancelButton {
+    min-height: 44px;
+    min-width: 44px;
+    padding: 0.875rem 1.25rem;
+    font-size: 1rem;
+    touch-action: manipulation;
+  }
+
+  .voteButton {
+    min-height: 80px;
+    padding: 1rem;
+    touch-action: manipulation;
+  }
+
+  .shareButton {
+    min-width: 44px;
+    min-height: 44px;
+    padding: 0.75rem;
+  }
+
+  .filterTab,
+  .claimAllButton {
+    min-height: 44px;
+    padding: 0.75rem 1rem;
+    font-size: 0.9375rem;
+    touch-action: manipulation;
+  }
+
+  /* Better mobile layout for market cards */
+  .marketCard {
+    padding: 1rem;
+  }
+
+  .marketQuestion {
+    font-size: 1.125rem;
+    line-height: 1.3;
+  }
+
+  .marketHeaderTop {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .marketBadges {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .marketStats {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .votingSection {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .voteButton {
+    width: 100%;
+  }
+
+  .multipleOutcomes {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .multipleOutcomes .voteButton {
+    width: 100%;
+  }
+
+  /* Search and filters mobile layout */
+  .searchFiltersSection {
+    padding: 1rem;
+  }
+
+  .searchBar {
+    margin-bottom: 1rem;
+  }
+
+  .searchInput {
+    width: 100%;
+    min-height: 44px;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  .filtersRow {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+
+  .filterGroup {
+    width: 100%;
+  }
+
+  .filterSelect {
+    width: 100%;
+    min-height: 44px;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  /* User stats mobile */
+  .userStatsSection {
+    padding: 1.5rem 1rem;
+  }
+
+  .statsTitle {
+    font-size: 1.5rem;
+  }
+
+  .statCard {
+    padding: 1.25rem;
+  }
+
+  .statValue {
+    font-size: 1.75rem;
+  }
+
+  /* Modal mobile */
+  .modal {
+    width: 95%;
+    max-width: 95%;
+    margin: 1rem;
+    padding: 1.25rem;
+  }
+
+  .modalHeader h2 {
+    font-size: 1.25rem;
+  }
+
+  .input,
+  .filterSelect {
+    min-height: 44px;
+    font-size: 1rem;
+    padding: 0.75rem 1rem;
+  }
+
+  /* Toast mobile */
+  .toast {
+    bottom: 1rem;
+    right: 1rem;
+    left: 1rem;
+    min-width: auto;
+    max-width: none;
+    padding: 1rem;
+  }
+
+  /* Loading overlay mobile */
+  .loadingContent {
+    margin: 1rem;
+    padding: 1.5rem;
+    min-width: auto;
+    width: calc(100% - 2rem);
+  }
+
+  /* Landing page mobile */
+  .hero {
+    padding: 2rem 1rem;
+  }
+
+  .heroTitle {
+    font-size: 2.5rem;
+  }
+
+  .heroSubtitle {
+    font-size: 1.125rem;
+  }
+
+  .heroDescription {
+    font-size: 0.9375rem;
+  }
+
+  .features,
+  .howItWorks {
+    padding: 2rem 1rem;
+  }
+
+  .featuresTitle,
+  .howItWorks .sectionTitle {
+    font-size: 1.75rem;
+  }
+
+  .featureCard,
+  .step {
+    padding: 1.5rem;
+  }
+
+  .featureIcon {
+    font-size: 2.5rem;
+  }
+
+  .featureTitle,
+  .stepTitle {
+    font-size: 1.25rem;
+  }
+
+  .stepNumber {
+    width: 50px;
+    height: 50px;
+    font-size: 1.25rem;
+  }
+
+  .finalCta {
+    padding: 2rem 1rem;
+  }
+
+  .ctaTitle {
+    font-size: 1.75rem;
+  }
+
+  /* Probability display mobile */
+  .probabilityValue {
+    font-size: 1.25rem;
+  }
+
+  .voteLabel {
+    font-size: 1rem;
+  }
+
+  /* Market grid mobile */
+  .marketsGrid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  /* Section titles mobile */
+  .sectionTitle {
+    font-size: 1.5rem;
+  }
+}
+
+/* Small mobile devices (max-width: 480px) */
+@media (max-width: 480px) {
+  .container {
+    padding: 0.75rem;
+  }
+
+  .header {
+    padding: 0.75rem;
+  }
+
+  .header h1 {
+    font-size: 1.25rem;
+  }
+
+  .card {
+    padding: 0.875rem;
+  }
+
+  .heroTitle {
+    font-size: 2rem;
+  }
+
+  .featuresTitle,
+  .howItWorks .sectionTitle,
+  .ctaTitle {
+    font-size: 1.5rem;
+  }
+
+  .statValue {
+    font-size: 1.5rem;
+  }
+
+  .statIcon {
+    font-size: 2rem;
+  }
+
+  .featureIcon {
+    font-size: 2rem;
+  }
+
+  .stepNumber {
+    width: 45px;
+    height: 45px;
+    font-size: 1.125rem;
+  }
+
+  .modal {
+    width: 100%;
+    max-width: 100%;
+    margin: 0;
+    border-radius: 0;
+    max-height: 100vh;
+    overflow-y: auto;
+  }
+
+  .toast {
+    bottom: 0.5rem;
+    right: 0.5rem;
+    left: 0.5rem;
+    padding: 0.875rem;
+  }
+
+  .loadingContent {
+    margin: 0.5rem;
+    padding: 1.25rem;
+    width: calc(100% - 1rem);
+  }
+}
+
+/* Tablet optimizations (768px - 1024px) */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .marketsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .votingSection {
+    gap: 1rem;
+  }
+
+  .voteButton {
+    min-height: 100px;
+  }
+
+  .filtersRow {
+    flex-wrap: wrap;
+  }
+
+  .filterGroup {
+    flex: 1 1 auto;
+    min-width: 200px;
+  }
+}
+
+/* Responsive probability displays and charts */
+.probabilityDisplay {
+  min-width: 60px;
+}
+
+@media (max-width: 768px) {
+  .probabilityDisplay {
+    min-width: 50px;
+  }
+
+  .probabilityValue {
+    font-size: 1.125rem;
+  }
+
+  .probabilityLabel {
+    font-size: 0.6875rem;
+  }
+}
+
+/* Touch-friendly interactive elements */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects on touch devices */
+  .button:hover,
+  .voteButton:hover,
+  .claimButton:hover,
+  .resolveButton:hover {
+    transform: none;
+  }
+
+  /* Increase tap target sizes */
+  .button,
+  .voteButton,
+  .claimButton,
+  .resolveButton,
+  .shareButton,
+  .filterTab,
+  .claimAllButton {
+    -webkit-tap-highlight-color: rgba(102, 126, 234, 0.3);
+    tap-highlight-color: rgba(102, 126, 234, 0.3);
+  }
+}
+
+/* Prevent text selection on buttons during tap */
+.button,
+.voteButton,
+.claimButton,
+.resolveButton,
+.shareButton,
+.filterTab,
+.claimAllButton,
+.submitButton,
+.cancelButton {
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+}
+
 /* Landing Page Styles */
 .landingPage {
   max-width: 1200px;
