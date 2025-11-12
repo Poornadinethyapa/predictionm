@@ -18,6 +18,8 @@ export default function Home() {
   const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'resolved', 'expired', 'myMarkets'
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'deadline', 'totalStaked', 'mostPopular'
   const [searchQuery, setSearchQuery] = useState('');
+  const [toast, setToast] = useState(null);
+  const [pendingTx, setPendingTx] = useState(null);
 
   // Create market form state
   const [newQuestion, setNewQuestion] = useState('');
@@ -93,6 +95,21 @@ export default function Home() {
     }
   }, [contract, address, loadMarkets]);
 
+  // Update time remaining every minute
+  useEffect(() => {
+    if (!isConnected) return;
+    const interval = setInterval(() => {
+      // Force re-render to update time remaining
+      setMarkets(prev => [...prev]);
+    }, 60000); // Update every minute
+    return () => clearInterval(interval);
+  }, [isConnected]);
+
+  const showToast = (message, type = 'success', txHash = null) => {
+    setToast({ message, type, txHash });
+    setTimeout(() => setToast(null), 5000);
+  };
+
   const createMarket = async (e) => {
     e.preventDefault();
     if (!contract || !signer) return;
@@ -102,16 +119,21 @@ export default function Home() {
       const deadline = Math.floor(new Date(newDeadline).getTime() / 1000);
       
       const tx = await contract.createMarket(newQuestion, outcomes, deadline);
+      setPendingTx(tx.hash);
+      showToast('Transaction submitted...', 'info', tx.hash);
+      
       await tx.wait();
+      setPendingTx(null);
       
       setNewQuestion('');
       setNewOutcomes('');
       setNewDeadline('');
       await loadMarkets();
-      alert('Market created successfully!');
+      showToast('Market created successfully!', 'success', tx.hash);
     } catch (err) {
       console.error('Error creating market:', err);
-      alert('Error creating market: ' + (err.message || err));
+      setPendingTx(null);
+      showToast('Error creating market: ' + (err.message || err), 'error');
     } finally {
       setLoading(false);
     }
@@ -142,21 +164,26 @@ export default function Home() {
     e.preventDefault();
     if (!contract || !signer || selectedMarket === null || selectedOutcome === null) return;
     if (!betAmount || parseFloat(betAmount) <= 0) {
-      alert('Please enter a valid bet amount');
+      showToast('Please enter a valid bet amount', 'error');
       return;
     }
     setLoading(true);
     try {
       const amount = ethers.utils.parseEther(betAmount);
       const tx = await contract.placeBet(selectedMarket.id, selectedOutcome, { value: amount });
+      setPendingTx(tx.hash);
+      showToast('Transaction submitted...', 'info', tx.hash);
+      
       await tx.wait();
+      setPendingTx(null);
       
       closeBetModal();
       await loadMarkets();
-      alert('Bet placed successfully!');
+      showToast('Bet placed successfully!', 'success', tx.hash);
     } catch (err) {
       console.error('Error placing bet:', err);
-      alert('Error placing bet: ' + (err.message || err));
+      setPendingTx(null);
+      showToast('Error placing bet: ' + (err.message || err), 'error');
     } finally {
       setLoading(false);
     }
@@ -173,15 +200,20 @@ export default function Home() {
     setLoading(true);
     try {
       const tx = await contract.resolveMarket(resolveMarketId, resolveOutcome);
+      setPendingTx(tx.hash);
+      showToast('Transaction submitted...', 'info', tx.hash);
+      
       await tx.wait();
+      setPendingTx(null);
       
       setResolveMarketId('');
       setResolveOutcome('');
       await loadMarkets();
-      alert('Market resolved successfully!');
+      showToast('Market resolved successfully!', 'success', tx.hash);
     } catch (err) {
       console.error('Error resolving market:', err);
-      alert('Error resolving market: ' + (err.message || err));
+      setPendingTx(null);
+      showToast('Error resolving market: ' + (err.message || err), 'error');
     } finally {
       setLoading(false);
     }
@@ -192,13 +224,18 @@ export default function Home() {
     setLoading(true);
     try {
       const tx = await contract.claim(marketId);
+      setPendingTx(tx.hash);
+      showToast('Transaction submitted...', 'info', tx.hash);
+      
       await tx.wait();
+      setPendingTx(null);
       
       await loadMarkets();
-      alert('Winnings claimed successfully!');
+      showToast('Winnings claimed successfully!', 'success', tx.hash);
     } catch (err) {
       console.error('Error claiming winnings:', err);
-      alert('Error claiming winnings: ' + (err.message || err));
+      setPendingTx(null);
+      showToast('Error claiming winnings: ' + (err.message || err), 'error');
     } finally {
       setLoading(false);
     }
@@ -216,27 +253,32 @@ export default function Home() {
       });
 
       if (claimableMarkets.length === 0) {
-        alert('No winnings to claim!');
+        showToast('No winnings to claim!', 'info');
         setLoading(false);
         return;
       }
 
       // Claim winnings for each market
+      let successCount = 0;
       for (const market of claimableMarkets) {
         try {
           const tx = await contract.claim(market.id);
+          setPendingTx(tx.hash);
           await tx.wait();
+          successCount++;
         } catch (err) {
           console.error(`Error claiming market ${market.id}:`, err);
           // Continue with other markets even if one fails
         }
       }
+      setPendingTx(null);
 
       await loadMarkets();
-      alert(`Successfully claimed winnings from ${claimableMarkets.length} market(s)!`);
+      showToast(`Successfully claimed winnings from ${successCount} market(s)!`, 'success');
     } catch (err) {
       console.error('Error claiming all winnings:', err);
-      alert('Error claiming winnings: ' + (err.message || err));
+      setPendingTx(null);
+      showToast('Error claiming winnings: ' + (err.message || err), 'error');
     } finally {
       setLoading(false);
     }
@@ -409,6 +451,46 @@ export default function Home() {
       minute: '2-digit',
       hour12: false
     }) + ' UTC';
+  };
+
+  const getTimeRemaining = (deadline) => {
+    const now = Math.floor(Date.now() / 1000);
+    const remaining = deadline - now;
+    
+    if (remaining <= 0) return null;
+    
+    const days = Math.floor(remaining / 86400);
+    const hours = Math.floor((remaining % 86400) / 3600);
+    const minutes = Math.floor((remaining % 3600) / 60);
+    
+    if (days > 0) return `${days}d ${hours}h`;
+    if (hours > 0) return `${hours}h ${minutes}m`;
+    return `${minutes}m`;
+  };
+
+  const getMarketStatus = (market) => {
+    if (market.resolved) return 'resolved';
+    const isExpired = new Date(market.deadline * 1000) < new Date();
+    if (isExpired) return 'expired';
+    return 'active';
+  };
+
+  const getNumberOfBets = (market) => {
+    // Count outcomes with stakes > 0 as an approximation of number of bets
+    return market.outcomeStakes.filter(s => parseFloat(s || '0') > 0).length;
+  };
+
+  const shareMarket = (marketId) => {
+    const url = `${window.location.origin}${window.location.pathname}?market=${marketId}`;
+    navigator.clipboard.writeText(url).then(() => {
+      showToast('Market link copied to clipboard!', 'success');
+    }).catch(() => {
+      showToast('Failed to copy link', 'error');
+    });
+  };
+
+  const getBlockExplorerUrl = (txHash) => {
+    return `https://sepolia.basescan.org/tx/${txHash}`;
   };
 
   return (
@@ -783,15 +865,42 @@ export default function Home() {
                   return (
                     <div key={market.id} className={styles.marketCard}>
                       <div className={styles.marketHeader}>
-                        <h3 className={styles.marketQuestion}>{market.question}</h3>
+                        <div className={styles.marketHeaderTop}>
+                          <h3 className={styles.marketQuestion}>{market.question}</h3>
+                          <button
+                            className={styles.shareButton}
+                            onClick={() => shareMarket(market.id)}
+                            title="Share market"
+                          >
+                            🔗
+                          </button>
+                        </div>
                         <div className={styles.marketMeta}>
+                          <div className={styles.marketBadges}>
+                            {getMarketStatus(market) === 'active' && (
+                              <span className={styles.activeBadge}>Active</span>
+                            )}
+                            {getMarketStatus(market) === 'resolved' && (
+                              <span className={styles.resolvedBadge}>Resolved: {market.outcomes[market.winningOutcome]}</span>
+                            )}
+                            {getMarketStatus(market) === 'expired' && (
+                              <span className={styles.expiredBadge}>Expired</span>
+                            )}
+                            {getMarketStatus(market) === 'active' && getTimeRemaining(market.deadline) && (
+                              <span className={styles.timeRemainingBadge}>
+                                ⏱️ {getTimeRemaining(market.deadline)} left
+                              </span>
+                            )}
+                          </div>
+                          <div className={styles.marketStats}>
+                            <span className={styles.statItem}>
+                              💰 {parseFloat(market.totalStaked).toFixed(4)} ETH staked
+                            </span>
+                            <span className={styles.statItem}>
+                              📊 {getNumberOfBets(market)} bet{getNumberOfBets(market) !== 1 ? 's' : ''}
+                            </span>
+                          </div>
                           <span className={styles.deadline}>Deadline: {formatDate(market.deadline)}</span>
-                          {market.resolved && (
-                            <span className={styles.resolvedBadge}>Resolved: {market.outcomes[market.winningOutcome]}</span>
-                          )}
-                          {isExpired && !market.resolved && (
-                            <span className={styles.expiredBadge}>Expired</span>
-                          )}
                         </div>
                       </div>
 
@@ -943,6 +1052,45 @@ export default function Home() {
             </div>
           )}
         </>
+      )}
+
+      {/* Toast Notification */}
+      {toast && (
+        <div className={`${styles.toast} ${styles[`toast${toast.type.charAt(0).toUpperCase() + toast.type.slice(1)}`]}`}>
+          <div className={styles.toastContent}>
+            <span>{toast.message}</span>
+            {toast.txHash && (
+              <a
+                href={getBlockExplorerUrl(toast.txHash)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.txLink}
+                onClick={(e) => e.stopPropagation()}
+              >
+                View on Basescan ↗
+              </a>
+            )}
+          </div>
+          <button className={styles.toastClose} onClick={() => setToast(null)}>×</button>
+        </div>
+      )}
+
+      {/* Loading Overlay */}
+      {loading && pendingTx && (
+        <div className={styles.loadingOverlay}>
+          <div className={styles.loadingContent}>
+            <div className={styles.spinner}></div>
+            <p>Transaction pending...</p>
+            <a
+              href={getBlockExplorerUrl(pendingTx)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.txLink}
+            >
+              View on Basescan ↗
+            </a>
+          </div>
+        </div>
       )}
     </div>
   );

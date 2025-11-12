@@ -359,20 +359,84 @@ select.input option {
   margin-bottom: 1.5rem;
 }
 
+.marketHeaderTop {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
 .marketQuestion {
   color: #ffffff;
-  margin-bottom: 0.75rem;
   font-size: 1.25rem;
   font-weight: 600;
   line-height: 1.4;
+  flex: 1;
+  margin: 0;
+}
+
+.shareButton {
+  background: rgba(148, 163, 184, 0.1);
+  border: 1px solid #475569;
+  border-radius: 6px;
+  padding: 0.5rem;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+
+.shareButton:hover {
+  background: rgba(148, 163, 184, 0.2);
+  border-color: #64748b;
+  transform: scale(1.1);
 }
 
 .marketMeta {
   display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  font-size: 0.875rem;
+  color: #94a3b8;
+}
+
+.marketBadges {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.marketStats {
+  display: flex;
   flex-wrap: wrap;
   gap: 1rem;
   font-size: 0.875rem;
-  color: #94a3b8;
+}
+
+.statItem {
+  color: #cbd5e1;
+  font-weight: 500;
+}
+
+.activeBadge {
+  background: #10b981;
+  color: #ffffff;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+.timeRemainingBadge {
+  background: rgba(102, 126, 234, 0.2);
+  color: #cbd5e1;
+  padding: 0.25rem 0.75rem;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: 1px solid rgba(102, 126, 234, 0.3);
 }
 
 .deadline {
@@ -690,6 +754,131 @@ select.input option {
 .submitButton:disabled {
   background: #6b7280;
   cursor: not-allowed;
+}
+
+/* Toast Notifications */
+.toast {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 1rem 1.5rem;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+  z-index: 10000;
+  min-width: 300px;
+  max-width: 500px;
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+.toastContent {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.toastSuccess {
+  border-left: 4px solid #10b981;
+}
+
+.toastError {
+  border-left: 4px solid #ef4444;
+}
+
+.toastInfo {
+  border-left: 4px solid #3b82f6;
+}
+
+.toastClose {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  background: none;
+  border: none;
+  color: #94a3b8;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.toastClose:hover {
+  background: #334155;
+  color: #ffffff;
+}
+
+.txLink {
+  color: #667eea;
+  text-decoration: none;
+  font-size: 0.875rem;
+  font-weight: 500;
+  transition: color 0.2s;
+}
+
+.txLink:hover {
+  color: #764ba2;
+  text-decoration: underline;
+}
+
+/* Loading Overlay */
+.loadingOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10001;
+}
+
+.loadingContent {
+  background: #1e293b;
+  border: 1px solid #334155;
+  border-radius: 12px;
+  padding: 2rem;
+  text-align: center;
+  min-width: 300px;
+}
+
+.spinner {
+  border: 3px solid #334155;
+  border-top: 3px solid #667eea;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.loadingContent p {
+  color: #cbd5e1;
+  margin-bottom: 1rem;
 }
 
 /* Landing Page Styles */
