@@ -15,6 +15,9 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [userStakes, setUserStakes] = useState({});
   const [activeFilter, setActiveFilter] = useState('all'); // 'all', 'myBets', 'myMarkets'
+  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'resolved', 'expired', 'myMarkets'
+  const [sortBy, setSortBy] = useState('newest'); // 'newest', 'deadline', 'totalStaked', 'mostPopular'
+  const [searchQuery, setSearchQuery] = useState('');
 
   // Create market form state
   const [newQuestion, setNewQuestion] = useState('');
@@ -240,23 +243,82 @@ export default function Home() {
   };
 
   const getFilteredMarkets = () => {
-    if (!address) return markets;
-    
-    switch (activeFilter) {
-      case 'myBets':
-        return markets.filter(market => {
-          if (!userStakes[market.id]) return false;
-          return market.outcomes.some((_, idx) => 
-            parseFloat(userStakes[market.id][idx] || '0') > 0
-          );
-        });
-      case 'myMarkets':
-        return markets.filter(market => 
-          market.owner.toLowerCase() === address.toLowerCase()
-        );
-      default:
-        return markets;
+    let filtered = markets;
+
+    // Apply search query
+    if (searchQuery.trim()) {
+      const query = searchQuery.toLowerCase();
+      filtered = filtered.filter(market => 
+        market.question.toLowerCase().includes(query) ||
+        market.outcomes.some(outcome => outcome.toLowerCase().includes(query))
+      );
     }
+
+    // Apply status filter
+    switch (statusFilter) {
+      case 'active':
+        filtered = filtered.filter(market => {
+          const isExpired = new Date(market.deadline * 1000) < new Date();
+          return !market.resolved && !isExpired;
+        });
+        break;
+      case 'resolved':
+        filtered = filtered.filter(market => market.resolved);
+        break;
+      case 'expired':
+        filtered = filtered.filter(market => {
+          const isExpired = new Date(market.deadline * 1000) < new Date();
+          return !market.resolved && isExpired;
+        });
+        break;
+      case 'myMarkets':
+        if (address) {
+          filtered = filtered.filter(market => 
+            market.owner.toLowerCase() === address.toLowerCase()
+          );
+        }
+        break;
+      default:
+        // 'all' - no status filter
+        break;
+    }
+
+    // Apply user filter (My Bets)
+    if (activeFilter === 'myBets' && address) {
+      filtered = filtered.filter(market => {
+        if (!userStakes[market.id]) return false;
+        return market.outcomes.some((_, idx) => 
+          parseFloat(userStakes[market.id][idx] || '0') > 0
+        );
+      });
+    }
+
+    // Apply sorting
+    switch (sortBy) {
+      case 'newest':
+        filtered = [...filtered].sort((a, b) => b.id - a.id);
+        break;
+      case 'deadline':
+        filtered = [...filtered].sort((a, b) => a.deadline - b.deadline);
+        break;
+      case 'totalStaked':
+        filtered = [...filtered].sort((a, b) => 
+          parseFloat(b.totalStaked || '0') - parseFloat(a.totalStaked || '0')
+        );
+        break;
+      case 'mostPopular':
+        // Sort by number of unique bettors (approximated by total outcomes with stakes)
+        filtered = [...filtered].sort((a, b) => {
+          const aBettors = a.outcomeStakes.filter(s => parseFloat(s || '0') > 0).length;
+          const bBettors = b.outcomeStakes.filter(s => parseFloat(s || '0') > 0).length;
+          return bBettors - aBettors;
+        });
+        break;
+      default:
+        break;
+    }
+
+    return filtered;
   };
 
   const getClaimableCount = () => {
@@ -627,59 +689,84 @@ export default function Home() {
             </form>
           </div>
 
-          {/* Quick Actions */}
-          <div className={styles.quickActions}>
-            <div className={styles.filterTabs}>
-              <button
-                className={`${styles.filterTab} ${activeFilter === 'all' ? styles.activeTab : ''}`}
-                onClick={() => setActiveFilter('all')}
-              >
-                All Markets ({marketCount})
-              </button>
-              <button
-                className={`${styles.filterTab} ${activeFilter === 'myBets' ? styles.activeTab : ''}`}
-                onClick={() => setActiveFilter('myBets')}
-              >
-                My Bets ({markets.filter(m => {
-                  if (!userStakes[m.id]) return false;
-                  return m.outcomes.some((_, idx) => 
-                    parseFloat(userStakes[m.id][idx] || '0') > 0
-                  );
-                }).length})
-              </button>
-              <button
-                className={`${styles.filterTab} ${activeFilter === 'myMarkets' ? styles.activeTab : ''}`}
-                onClick={() => setActiveFilter('myMarkets')}
-              >
-                My Markets ({markets.filter(m => 
-                  m.owner.toLowerCase() === address?.toLowerCase()
-                ).length})
-              </button>
+          {/* Search and Filters */}
+          <div className={styles.searchFiltersSection}>
+            <div className={styles.searchBar}>
+              <input
+                type="text"
+                className={styles.searchInput}
+                placeholder="Search markets by question..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            {getClaimableCount() > 0 && (
-              <button
-                className={styles.claimAllButton}
-                onClick={claimAllWinnings}
-                disabled={loading}
-              >
-                Claim All Winnings ({getClaimableCount()})
-              </button>
-            )}
+            
+            <div className={styles.filtersRow}>
+              <div className={styles.filterGroup}>
+                <label className={styles.filterLabel}>Filter:</label>
+                <select
+                  className={styles.filterSelect}
+                  value={statusFilter}
+                  onChange={(e) => setStatusFilter(e.target.value)}
+                >
+                  <option value="all">All Markets</option>
+                  <option value="active">Active</option>
+                  <option value="resolved">Resolved</option>
+                  <option value="expired">Expired</option>
+                  {address && <option value="myMarkets">My Markets</option>}
+                </select>
+              </div>
+
+              <div className={styles.filterGroup}>
+                <label className={styles.filterLabel}>Sort by:</label>
+                <select
+                  className={styles.filterSelect}
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                >
+                  <option value="newest">Newest</option>
+                  <option value="deadline">Deadline</option>
+                  <option value="totalStaked">Total Staked</option>
+                  <option value="mostPopular">Most Popular</option>
+                </select>
+              </div>
+
+              <div className={styles.filterGroup}>
+                <button
+                  className={`${styles.filterTab} ${activeFilter === 'myBets' ? styles.activeTab : ''}`}
+                  onClick={() => setActiveFilter(activeFilter === 'myBets' ? 'all' : 'myBets')}
+                >
+                  My Bets ({markets.filter(m => {
+                    if (!userStakes[m.id]) return false;
+                    return m.outcomes.some((_, idx) => 
+                      parseFloat(userStakes[m.id][idx] || '0') > 0
+                    );
+                  }).length})
+                </button>
+              </div>
+
+              {getClaimableCount() > 0 && (
+                <button
+                  className={styles.claimAllButton}
+                  onClick={claimAllWinnings}
+                  disabled={loading}
+                >
+                  Claim All ({getClaimableCount()})
+                </button>
+              )}
+            </div>
           </div>
 
           {/* Markets List */}
           <div className={styles.marketsSection}>
             <h2 className={styles.sectionTitle}>
-              {activeFilter === 'all' && `Markets (${marketCount})`}
-              {activeFilter === 'myBets' && `My Bets (${getFilteredMarkets().length})`}
-              {activeFilter === 'myMarkets' && `My Markets (${getFilteredMarkets().length})`}
+              {getFilteredMarkets().length} {getFilteredMarkets().length === 1 ? 'Market' : 'Markets'}
+              {searchQuery && ` matching "${searchQuery}"`}
             </h2>
             {getFilteredMarkets().length === 0 ? (
               <div className={styles.emptyState}>
                 <p>
-                  {activeFilter === 'all' && 'No markets created yet.'}
-                  {activeFilter === 'myBets' && 'You haven\'t placed any bets yet.'}
-                  {activeFilter === 'myMarkets' && 'You haven\'t created any markets yet.'}
+                  {searchQuery ? `No markets found matching "${searchQuery}"` : 'No markets found with the selected filters.'}
                 </p>
               </div>
             ) : (
