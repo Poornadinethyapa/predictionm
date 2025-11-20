@@ -41,15 +41,18 @@ export default function Home() {
   const loadMarkets = useCallback(async () => {
     if (!contract || !provider) return;
     try {
+      setLoading(true);
       const count = await contract.marketCount();
       setMarketCount(count.toNumber());
       
       const marketList = [];
       const stakes = {};
+      
+      // Fetch all markets in parallel
+      const marketPromises = [];
       for (let i = 0; i < count.toNumber(); i++) {
-        try {
-          const market = await contract.getMarketBasic(i);
-          marketList.push({
+        marketPromises.push(
+          contract.getMarketBasic(i).then(market => ({
             id: i,
             owner: market.owner,
             question: market.question,
@@ -59,28 +62,50 @@ export default function Home() {
             totalStaked: ethers.utils.formatEther(market.totalStaked),
             outcomeStakes: market.outcomeStakes.map(s => ethers.utils.formatEther(s)),
             outcomes: market.outcomes,
-          });
-          
-          // Load user stakes for this market
-          if (address && market.outcomes.length > 0) {
-            stakes[i] = {};
-            for (let j = 0; j < market.outcomes.length; j++) {
-              try {
-                const stake = await contract.userStakeIn(i, address, j);
-                stakes[i][j] = ethers.utils.formatEther(stake);
-              } catch (err) {
-                stakes[i][j] = '0';
-              }
-            }
-          }
-        } catch (err) {
-          console.error(`Error loading market ${i}:`, err);
-        }
+          })).catch(err => {
+            console.error(`Error loading market ${i}:`, err);
+            return null;
+          })
+        );
       }
-      setMarkets(marketList);
+      
+      const markets = await Promise.all(marketPromises);
+      const validMarkets = markets.filter(m => m !== null);
+      
+      // Fetch user stakes in parallel for all markets
+      if (address) {
+        const stakePromises = [];
+        validMarkets.forEach(market => {
+          stakes[market.id] = {};
+          for (let j = 0; j < market.outcomes.length; j++) {
+            stakePromises.push(
+              contract.userStakeIn(market.id, address, j)
+                .then(stake => ({
+                  marketId: market.id,
+                  outcomeIdx: j,
+                  stake: ethers.utils.formatEther(stake)
+                }))
+                .catch(() => ({
+                  marketId: market.id,
+                  outcomeIdx: j,
+                  stake: '0'
+                }))
+            );
+          }
+        });
+        
+        const stakeResults = await Promise.all(stakePromises);
+        stakeResults.forEach(({ marketId, outcomeIdx, stake }) => {
+          stakes[marketId][outcomeIdx] = stake;
+        });
+      }
+      
+      setMarkets(validMarkets);
       setUserStakes(stakes);
     } catch (err) {
       console.error('Error loading markets:', err);
+    } finally {
+      setLoading(false);
     }
   }, [contract, provider, address]);
 
