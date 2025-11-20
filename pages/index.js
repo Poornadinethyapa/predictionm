@@ -553,7 +553,7 @@ export default function Home() {
               className={styles.headerSearchInput}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search polymarket"
+              placeholder="Search Truecast"
             />
             <span className={styles.headerShortcutHint}>/</span>
           </div>
