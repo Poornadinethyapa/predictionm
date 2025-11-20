@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useAccount, useProvider, useSigner } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
@@ -21,8 +21,7 @@ export default function Home() {
   const [toast, setToast] = useState(null);
   const [pendingTx, setPendingTx] = useState(null);
   const [highlightedMarketId, setHighlightedMarketId] = useState(null);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
-  const [searchDraft, setSearchDraft] = useState('');
+  const searchInputRef = useRef(null);
 
   // Create market form state
   const [newQuestion, setNewQuestion] = useState('');
@@ -127,24 +126,19 @@ export default function Home() {
     setTimeout(() => setToast(null), 5000);
   };
 
-  const openSearch = () => {
-    setSearchDraft(searchQuery);
-    setIsSearchOpen(true);
-  };
-
-  const closeSearch = () => {
-    setIsSearchOpen(false);
-  };
-
-  const submitSearch = (e) => {
-    e.preventDefault();
-    setSearchQuery(searchDraft);
-    setIsSearchOpen(false);
-    const el = document.getElementById('markets-section');
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-  };
+  useEffect(() => {
+    const onKeyDown = (e) => {
+      if (e.key === '/') {
+        const target = e.target;
+        const tag = target && target.tagName ? target.tagName.toLowerCase() : '';
+        if (tag === 'input' || tag === 'textarea' || target?.isContentEditable) return;
+        e.preventDefault();
+        searchInputRef.current?.focus();
+      }
+    };
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, []);
 
   const createMarket = async (e) => {
     e.preventDefault();
@@ -551,7 +545,18 @@ export default function Home() {
       <header className={styles.header}>
         <h1>Truecast</h1>
         <div className={styles.headerActions}>
-          <button className={styles.searchButton} onClick={openSearch} title="Search">🔍</button>
+          <div className={styles.headerSearchWrapper}>
+            <span className={styles.headerSearchIcon}>🔍</span>
+            <input
+              ref={searchInputRef}
+              type="text"
+              className={styles.headerSearchInput}
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              placeholder="Search polymarket"
+            />
+            <span className={styles.headerShortcutHint}>/</span>
+          </div>
           <ConnectButton />
         </div>
       </header>
@@ -1190,31 +1195,6 @@ export default function Home() {
                       <button type="submit" className={styles.submitButton} disabled={loading}>
                         {loading ? 'Placing Bet...' : 'Place Bet'}
                       </button>
-                    </div>
-                  </form>
-                </div>
-              </div>
-            </div>
-          )}
-          {isSearchOpen && (
-            <div className={styles.modalOverlay} onClick={closeSearch}>
-              <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
-                <div className={styles.modalHeader}>
-                  <h2>Search Markets</h2>
-                  <button className={styles.closeButton} onClick={closeSearch}>×</button>
-                </div>
-                <div className={styles.modalBody}>
-                  <form onSubmit={submitSearch}>
-                    <input
-                      type="text"
-                      className={styles.searchInput}
-                      value={searchDraft}
-                      onChange={(e) => setSearchDraft(e.target.value)}
-                      placeholder="Search by question or outcome"
-                    />
-                    <div className={styles.modalActions}>
-                      <button type="button" className={styles.cancelButton} onClick={closeSearch}>Cancel</button>
-                      <button type="submit" className={styles.submitButton}>Search</button>
                     </div>
                   </form>
                 </div>
