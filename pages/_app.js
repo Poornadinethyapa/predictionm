@@ -4,6 +4,7 @@ import { getDefaultWallets, RainbowKitProvider } from '@rainbow-me/rainbowkit';
 import { configureChains, createClient, WagmiConfig } from 'wagmi';
 import { publicProvider } from 'wagmi/providers/public';
 import Head from 'next/head';
+import Navbar from '../components/Navbar';
 
 // Base Sepolia chain configuration
 const baseSepolia = {
@@ -46,7 +47,10 @@ export default function App({ Component, pageProps }) {
       </Head>
       <WagmiConfig client={wagmiClient}>
         <RainbowKitProvider chains={chains}>
-          <Component {...pageProps} />
+          <Navbar />
+          <main style={{ marginTop: '64px' }}>
+            <Component {...pageProps} />
+          </main>
         </RainbowKitProvider>
       </WagmiConfig>
     </>
