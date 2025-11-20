@@ -162,9 +162,9 @@ export default function Home() {
 
   const formatVolume = (eth) => {
     const n = parseFloat(eth || '0');
-    if (n >= 1000) return `${(n/1000).toFixed(2)}k ETH Vol.`;
-    if (n >= 1) return `${n.toFixed(2)} ETH Vol.`;
-    return `${n.toFixed(2)} ETH Vol.`;
+    if (n >= 1000) return `${(n/1000).toFixed(3)}k ETH Vol.`;
+    if (n >= 1) return `${n.toFixed(3)} ETH Vol.`;
+    return `${n.toFixed(3)} ETH Vol.`;
   };
 
   const openBetModal = (marketId, outcomeIndex) => {
