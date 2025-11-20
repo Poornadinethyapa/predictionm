@@ -598,6 +598,7 @@ export default function Home() {
                 >
                   <option value="active">Active</option>
                   <option value="expired">Expired</option>
+                  <option value="resolved">Resolved</option>
                 </select>
               </div>
 
