@@ -92,13 +92,13 @@ export default function CreateMarket() {
   return (
     <div className={styles.container}>
       <div className={styles.card}>
-        <h1>Create a New Market</h1>
+        <h1 className={styles.title}>Create a New Market</h1>
         
         {error && <div className={styles.error}>{error}</div>}
         
         <form onSubmit={handleSubmit}>
           <div className={styles.formGroup}>
-            <label>Question</label>
+            <label className={styles.label}>Question</label>
             <input
               type="text"
               value={question}
@@ -109,7 +109,7 @@ export default function CreateMarket() {
           </div>
           
           <div className={styles.formGroup}>
-            <label>Category</label>
+            <label className={styles.label}>Category</label>
             <select 
               value={category} 
               onChange={(e) => setCategory(e.target.value)}
@@ -124,7 +124,7 @@ export default function CreateMarket() {
           </div>
           
           <div className={styles.formGroup}>
-            <label>End Date & Time</label>
+            <label className={styles.label}>End Date & Time</label>
             <div className={styles.datetimeInputs}>
               <input
                 type="date"
@@ -143,7 +143,7 @@ export default function CreateMarket() {
           </div>
           
           <div className={styles.formGroup}>
-            <label>Outcomes (at least 2 required)</label>
+            <label className={styles.label}>Outcomes (at least 2 required)</label>
             {outcomes.map((outcome, index) => (
               <div key={index} className={styles.outcomeRow}>
                 <input

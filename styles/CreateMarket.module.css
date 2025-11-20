@@ -11,7 +11,7 @@
   box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
 }
 
-h1 {
+.title {
   color: #f8fafc;
   font-size: 1.75rem;
   margin-bottom: 2rem;
@@ -22,7 +22,7 @@ h1 {
   margin-bottom: 1.5rem;
 }
 
-label {
+.label {
   display: block;
   color: #94a3b8;
   margin-bottom: 0.5rem;
