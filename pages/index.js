@@ -639,18 +639,6 @@ export default function Home() {
           className={styles.filterTab}
           onClick={() => {
             if (!isConnected) {
-              showToast('Connect wallet to create markets', 'error');
-              return;
-            }
-            document.getElementById('create-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-        >
-          Create
-        </button>
-        <button
-          className={styles.filterTab}
-          onClick={() => {
-            if (!isConnected) {
               showToast('Connect wallet to resolve markets', 'error');
               return;
             }
@@ -811,55 +799,6 @@ export default function Home() {
               </div>
             </div>
           )}
-
-          {/* Create Market Section */}
-          <div id="create-section" className={styles.card}>
-            <h2>Create New Market</h2>
-            <form onSubmit={createMarket}>
-              <div>
-                <label className={styles.label}>Question</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  value={newQuestion}
-                  onChange={(e) => setNewQuestion(e.target.value)}
-                  placeholder="Will it rain tomorrow?"
-                  required
-                />
-              </div>
-              <div>
-                <label className={styles.label}>Outcomes (comma-separated, e.g., "Yes, No")</label>
-                <input
-                  type="text"
-                  className={styles.input}
-                  value={newOutcomes}
-                  onChange={(e) => setNewOutcomes(e.target.value)}
-                  placeholder="Yes, No"
-                  required
-                />
-                <small style={{ color: '#94a3b8', fontSize: '0.875rem' }}>
-                  Note: The UI is optimized for Yes/No markets. Other outcomes will still work but may not display optimally.
-                </small>
-              </div>
-              <div>
-                <label className={styles.label}>Deadline (UTC)</label>
-                <input
-                  type="datetime-local"
-                  className={styles.input}
-                  value={newDeadline}
-                  onChange={(e) => setNewDeadline(e.target.value)}
-                  required
-                />
-                <small style={{ color: '#94a3b8', fontSize: '0.875rem', display: 'block', marginTop: '0.25rem' }}>
-                  All times are displayed in UTC timezone
-                </small>
-              </div>
-              <button type="submit" className={styles.button} disabled={loading}>
-                Create Market
-              </button>
-            </form>
-          </div>
-
 
           {/* Resolve Market Section */}
           <div id="resolve-section" className={styles.card}>
@@ -1048,12 +987,6 @@ export default function Home() {
                           <div className={styles.marketMetaCompact}>
                             <span className={styles.marketDeadline}>{formatDate(market.deadline)}</span>
                           </div>
-                        </div>
-                        <div className={styles.marketChance}>
-                          <div className={styles.gauge} style={{ background: `conic-gradient(#10b981 ${parseFloat(topProb) * 3.6}deg, #334155 0)` }}>
-                            <div className={styles.gaugeInner}>{topProb}%</div>
-                          </div>
-                          <span className={styles.marketChanceLabel}>chance</span>
                         </div>
                       </div>
 
