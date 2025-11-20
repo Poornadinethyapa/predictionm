@@ -175,6 +175,9 @@ select.input option {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  margin-bottom: 3rem;
+  padding-bottom: 1.5rem;
+  border-bottom: 1px solid rgba(148, 163, 184, 0.1);
 }
 
 .filterTab {
