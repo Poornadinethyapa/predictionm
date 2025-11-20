@@ -532,6 +532,95 @@ export default function Home() {
         <ConnectButton />
       </header>
 
+      <div className={styles.filterTabs}>
+        <button
+          className={`${styles.filterTab} ${statusFilter === 'all' && activeFilter === 'all' ? styles.activeTab : ''}`}
+          onClick={() => {
+            setStatusFilter('all');
+            setActiveFilter('all');
+            document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        >
+          Markets
+        </button>
+        <button
+          className={`${styles.filterTab} ${activeFilter === 'myBets' ? styles.activeTab : ''}`}
+          onClick={() => {
+            setActiveFilter(activeFilter === 'myBets' ? 'all' : 'myBets');
+            setStatusFilter('all');
+            document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        >
+          My Bets
+        </button>
+        <button
+          className={`${styles.filterTab} ${statusFilter === 'myMarkets' ? styles.activeTab : ''}`}
+          onClick={() => {
+            setStatusFilter('myMarkets');
+            setActiveFilter('all');
+            document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        >
+          My Markets
+        </button>
+        <button
+          className={`${styles.filterTab} ${statusFilter === 'resolved' ? styles.activeTab : ''}`}
+          onClick={() => {
+            setStatusFilter('resolved');
+            setActiveFilter('all');
+            document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        >
+          Resolved
+        </button>
+        <button
+          className={`${styles.filterTab} ${statusFilter === 'expired' ? styles.activeTab : ''}`}
+          onClick={() => {
+            setStatusFilter('expired');
+            setActiveFilter('all');
+            document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        >
+          Expired
+        </button>
+        <button
+          className={styles.filterTab}
+          onClick={() => {
+            if (!isConnected) {
+              showToast('Connect wallet to create markets', 'error');
+              return;
+            }
+            document.getElementById('create-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        >
+          Create
+        </button>
+        <button
+          className={styles.filterTab}
+          onClick={() => {
+            if (!isConnected) {
+              showToast('Connect wallet to resolve markets', 'error');
+              return;
+            }
+            document.getElementById('resolve-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        >
+          Resolve
+        </button>
+        <button
+          className={styles.filterTab}
+          onClick={() => {
+            if (!isConnected) {
+              showToast('Connect wallet to view stats', 'info');
+              return;
+            }
+            document.getElementById('stats-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }}
+        >
+          Stats
+        </button>
+      </div>
+
       {!isConnected && (
         <div className={styles.landingPage}>
           {/* Hero Section */}
@@ -638,7 +727,7 @@ export default function Home() {
         <>
           {/* User Profile Stats */}
           {getUserStats() && (
-            <div className={styles.userStatsSection}>
+            <div id="stats-section" className={styles.userStatsSection}>
               <h2 className={styles.statsTitle}>Your Stats</h2>
               <div className={styles.statsGrid}>
                 <div className={styles.statCard}>
@@ -672,7 +761,7 @@ export default function Home() {
           )}
 
           {/* Create Market Section */}
-          <div className={styles.card}>
+          <div id="create-section" className={styles.card}>
             <h2>Create New Market</h2>
             <form onSubmit={createMarket}>
               <div>
@@ -872,7 +961,7 @@ export default function Home() {
           </div>
 
           {/* Markets List */}
-          <div className={styles.marketsSection}>
+          <div id="markets-section" className={styles.marketsSection}>
             <h2 className={styles.sectionTitle}>
               {getFilteredMarkets().length} {getFilteredMarkets().length === 1 ? 'Market' : 'Markets'}
               {searchQuery && ` matching "${searchQuery}"`}
