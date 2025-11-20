@@ -472,29 +472,6 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <div className={styles.filterTabs}>
-        <button
-          className={`${styles.filterTab} ${statusFilter === 'active' ? styles.activeTab : ''}`}
-          onClick={() => {
-            setStatusFilter('active');
-            setActiveFilter('all');
-            document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-        >
-          Active
-        </button>
-        <button
-          className={`${styles.filterTab} ${statusFilter === 'expired' ? styles.activeTab : ''}`}
-          onClick={() => {
-            setStatusFilter('expired');
-            setActiveFilter('all');
-            document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-        >
-          Expired
-        </button>
-      </div>
-
       {!isConnected && (
         <div className={styles.landingPage}>
           {/* Hero Section */}
@@ -619,11 +596,8 @@ export default function Home() {
                   value={statusFilter}
                   onChange={(e) => setStatusFilter(e.target.value)}
                 >
-                  <option value="all">All Markets</option>
                   <option value="active">Active</option>
-                  <option value="resolved">Resolved</option>
                   <option value="expired">Expired</option>
-                  {address && <option value="myMarkets">My Markets</option>}
                 </select>
               </div>
 
@@ -639,20 +613,6 @@ export default function Home() {
                   <option value="totalStaked">Total Staked</option>
                   <option value="mostPopular">Most Popular</option>
                 </select>
-              </div>
-
-              <div className={styles.filterGroup}>
-                <button
-                  className={`${styles.filterTab} ${activeFilter === 'myBets' ? styles.activeTab : ''}`}
-                  onClick={() => setActiveFilter(activeFilter === 'myBets' ? 'all' : 'myBets')}
-                >
-                  My Bets ({markets.filter(m => {
-                    if (!userStakes[m.id]) return false;
-                    return m.outcomes.some((_, idx) => 
-                      parseFloat(userStakes[m.id][idx] || '0') > 0
-                    );
-                  }).length})
-                </button>
               </div>
 
               {getClaimableCount() > 0 && (
