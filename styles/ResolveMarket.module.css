@@ -1,0 +1,210 @@
+.container {
+  min-height: calc(100vh - 80px);
+  padding: 3rem 1.5rem;
+  background: linear-gradient(180deg, #0f172a 0%, #111827 100%);
+}
+
+.inner {
+  max-width: 760px;
+  margin: 0 auto;
+}
+
+.card {
+  background: rgba(15, 23, 42, 0.85);
+  border: 1px solid rgba(148, 163, 184, 0.2);
+  border-radius: 18px;
+  padding: 2.5rem;
+  box-shadow: 0 25px 50px rgba(15, 23, 42, 0.45);
+}
+
+.titleRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+
+.pageTitle {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #f8fafc;
+  margin: 0;
+}
+
+.subtitle {
+  color: #cbd5e1;
+  margin: 0 0 0.25rem 0;
+}
+
+.helperText {
+  color: #94a3b8;
+  font-size: 0.9rem;
+  margin: 0;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #e2e8f0;
+}
+
+.select,
+.input {
+  background: #0f172a;
+  border: 1px solid rgba(148, 163, 184, 0.35);
+  border-radius: 10px;
+  padding: 0.85rem 1rem;
+  color: #f8fafc;
+  font-size: 0.95rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.select:focus,
+.input:focus {
+  outline: none;
+  border-color: #6366f1;
+  box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.25);
+}
+
+.marketDetails {
+  background: rgba(99, 102, 241, 0.08);
+  border-radius: 12px;
+  padding: 1.25rem;
+  margin-bottom: 1.5rem;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.detailsList {
+  margin: 0.75rem 0 0;
+  padding-left: 1.25rem;
+  line-height: 1.6;
+}
+
+.outcomesGrid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.outcomePill {
+  background: rgba(148, 163, 184, 0.15);
+  border-radius: 999px;
+  padding: 0.35rem 0.85rem;
+  font-size: 0.85rem;
+  color: #f8fafc;
+}
+
+.buttonRow {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.primaryButton {
+  background: linear-gradient(120deg, #6366f1, #8b5cf6);
+  border: none;
+  border-radius: 999px;
+  padding: 0.9rem 2.25rem;
+  color: #fff;
+  font-weight: 600;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.primaryButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primaryButton:not(:disabled):hover {
+  transform: translateY(-1px);
+}
+
+.ghostButton {
+  background: transparent;
+  border: 1px solid rgba(148, 163, 184, 0.4);
+  color: #cbd5e1;
+  border-radius: 999px;
+  padding: 0.8rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: border-color 0.2s ease, color 0.2s ease;
+}
+
+.ghostButton:hover {
+  border-color: #f8fafc;
+  color: #f8fafc;
+}
+
+.alert {
+  border-radius: 12px;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.5rem;
+  font-size: 0.95rem;
+}
+
+.error {
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.4);
+  color: #fecaca;
+}
+
+.success {
+  background: rgba(74, 222, 128, 0.15);
+  border: 1px solid rgba(74, 222, 128, 0.4);
+  color: #bbf7d0;
+}
+
+.emptyState {
+  background: rgba(15, 23, 42, 0.7);
+  border: 1px dashed rgba(148, 163, 184, 0.4);
+  border-radius: 14px;
+  padding: 1.5rem;
+  text-align: center;
+  color: #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.pendingTx {
+  margin-top: 1.25rem;
+  font-size: 0.9rem;
+  color: #cbd5e1;
+}
+
+.pendingTx a {
+  color: #a5b4fc;
+  text-decoration: underline;
+}
+
+@media (max-width: 640px) {
+  .card {
+    padding: 1.75rem;
+  }
+
+  .titleRow {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .buttonRow {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .primaryButton,
+  .ghostButton {
+    width: 100%;
+    text-align: center;
+  }
+}

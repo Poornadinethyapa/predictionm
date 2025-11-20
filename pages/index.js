@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from 'react';
+import { useRouter } from 'next/router';
 import { useAccount, useProvider, useSigner } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import { ethers } from 'ethers';
@@ -6,6 +7,7 @@ import { CONTRACT_ADDRESS, CONTRACT_ABI } from '../lib/contract';
 import styles from '../styles/Home.module.css';
 
 export default function Home() {
+  const router = useRouter();
   const { address, isConnected } = useAccount();
   const provider = useProvider();
   const { data: signer } = useSigner();
@@ -24,20 +26,11 @@ export default function Home() {
   const searchInputRef = useRef(null);
   const [bookmarks, setBookmarks] = useState({});
 
-  // Create market form state
-  const [newQuestion, setNewQuestion] = useState('');
-  const [newOutcomes, setNewOutcomes] = useState('');
-  const [newDeadline, setNewDeadline] = useState('');
-
   // Bet modal state
   const [betModalOpen, setBetModalOpen] = useState(false);
   const [selectedMarket, setSelectedMarket] = useState(null);
   const [selectedOutcome, setSelectedOutcome] = useState(null);
   const [betAmount, setBetAmount] = useState('');
-
-  // Resolve form state
-  const [resolveMarketId, setResolveMarketId] = useState('');
-  const [resolveOutcome, setResolveOutcome] = useState('');
 
   useEffect(() => {
     if (provider && signer) {
@@ -163,52 +156,6 @@ export default function Home() {
     return `${n.toFixed(2)} ETH Vol.`;
   };
 
-  const createMarket = async (e) => {
-    e.preventDefault();
-    if (!contract || !signer) return;
-    setLoading(true);
-    try {
-      const outcomes = newOutcomes.split(',').map(o => o.trim()).filter(o => o);
-      if (outcomes.length < 2) {
-        showToast('Please provide at least two outcomes', 'error');
-        setLoading(false);
-        return;
-      }
-      const uniqueOutcomes = Array.from(new Set(outcomes));
-      if (uniqueOutcomes.length !== outcomes.length) {
-        showToast('Outcomes must be unique', 'error');
-        setLoading(false);
-        return;
-      }
-      const deadline = Math.floor(new Date(newDeadline).getTime() / 1000);
-      const nowTs = Math.floor(Date.now() / 1000);
-      if (!deadline || deadline <= nowTs) {
-        showToast('Deadline must be a future time', 'error');
-        setLoading(false);
-        return;
-      }
-      
-      const tx = await contract.createMarket(newQuestion, outcomes, deadline);
-      setPendingTx(tx.hash);
-      showToast('Transaction submitted...', 'info', tx.hash);
-      
-      await tx.wait();
-      setPendingTx(null);
-      
-      setNewQuestion('');
-      setNewOutcomes('');
-      setNewDeadline('');
-      await loadMarkets();
-      showToast('Market created successfully!', 'success', tx.hash);
-    } catch (err) {
-      console.error('Error creating market:', err);
-      setPendingTx(null);
-      showToast('Error creating market: ' + (err.message || err), 'error');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const openBetModal = (marketId, outcomeIndex) => {
     if (!marketId && marketId !== 0) return;
     const market = markets.find(m => m.id === marketId);
@@ -262,31 +209,6 @@ export default function Home() {
   const calculateProbability = (stake, totalStake) => {
     if (parseFloat(totalStake) === 0) return 50; // Default to 50% if no stakes
     return ((parseFloat(stake) / parseFloat(totalStake)) * 100).toFixed(1);
-  };
-
-  const resolveMarket = async (e) => {
-    e.preventDefault();
-    if (!contract || !signer) return;
-    setLoading(true);
-    try {
-      const tx = await contract.resolveMarket(resolveMarketId, resolveOutcome);
-      setPendingTx(tx.hash);
-      showToast('Transaction submitted...', 'info', tx.hash);
-      
-      await tx.wait();
-      setPendingTx(null);
-      
-      setResolveMarketId('');
-      setResolveOutcome('');
-      await loadMarkets();
-      showToast('Market resolved successfully!', 'success', tx.hash);
-    } catch (err) {
-      console.error('Error resolving market:', err);
-      setPendingTx(null);
-      showToast('Error resolving market: ' + (err.message || err), 'error');
-    } finally {
-      setLoading(false);
-    }
   };
 
   const claimWinnings = async (marketId) => {
