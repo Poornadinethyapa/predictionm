@@ -55,6 +55,9 @@ export default function Navbar() {
           <Link href="/resolve" className={styles.navLink}>
             Resolve Market
           </Link>
+          <Link href="/stats" className={styles.navLink}>
+            Stats
+          </Link>
           <div className={styles.navSearchContainer}>
             <div className={styles.navSearchWrapper}>
               <span className={styles.navSearchIcon}>🔍</span>
@@ -96,6 +99,9 @@ export default function Navbar() {
           </Link>
           <Link href="/resolve" className={styles.mobileNavLink} onClick={toggleMenu}>
             Resolve Market
+          </Link>
+          <Link href="/stats" className={styles.mobileNavLink} onClick={toggleMenu}>
+            Stats
           </Link>
           <div className={styles.mobileConnectButton}>
             <ConnectButton />

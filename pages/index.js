@@ -667,41 +667,6 @@ export default function Home() {
 
       {isConnected && (
         <>
-          {/* User Profile Stats */}
-          {getUserStats() && (
-            <div id="stats-section" className={styles.userStatsSection}>
-              <h2 className={styles.statsTitle}>Your Stats</h2>
-              <div className={styles.statsGrid}>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}>📊</div>
-                  <div className={styles.statValue}>{getUserStats().winRate}%</div>
-                  <div className={styles.statLabel}>Win Rate</div>
-                  <div className={styles.statSubtext}>
-                    {getUserStats().totalResolvedBets} resolved bet{getUserStats().totalResolvedBets !== 1 ? 's' : ''}
-                  </div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}>💰</div>
-                  <div className={styles.statValue}>{getUserStats().totalEarnings}</div>
-                  <div className={styles.statLabel}>Total Earnings (ETH)</div>
-                  <div className={styles.statSubtext}>From winning bets</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}>📝</div>
-                  <div className={styles.statValue}>{getUserStats().marketsCreated}</div>
-                  <div className={styles.statLabel}>Markets Created</div>
-                  <div className={styles.statSubtext}>Your prediction markets</div>
-                </div>
-                <div className={styles.statCard}>
-                  <div className={styles.statIcon}>🏆</div>
-                  <div className={styles.statValue}>{getUserStats().marketsWon}</div>
-                  <div className={styles.statLabel}>Markets Won</div>
-                  <div className={styles.statSubtext}>Successful predictions</div>
-                </div>
-              </div>
-            </div>
-          )}
-
           {/* Search and Filters */}
           <div className={styles.searchFiltersSection}>
             <div className={styles.searchBar}>
