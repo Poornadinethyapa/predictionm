@@ -120,20 +120,6 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const handleSearch = (event) => {
-      setSearchQuery(event.detail || '');
-    };
-    if (typeof window !== 'undefined') {
-      window.addEventListener('truecast_search', handleSearch);
-    }
-    return () => {
-      if (typeof window !== 'undefined') {
-        window.removeEventListener('truecast_search', handleSearch);
-      }
-    };
-  }, []);
-
-  useEffect(() => {
     try {
       const saved = localStorage.getItem('truecast_bookmarks');
       if (saved) setBookmarks(JSON.parse(saved));

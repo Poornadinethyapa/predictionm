@@ -6,7 +6,6 @@ import styles from '../styles/Navbar.module.css';
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [searchValue, setSearchValue] = useState('');
 
   // Handle scroll effect for navbar
   useEffect(() => {
@@ -25,14 +24,6 @@ export default function Navbar() {
 
   const toggleMenu = () => {
     setIsOpen(!isOpen);
-  };
-
-  const handleSearchChange = (e) => {
-    const value = e.target.value;
-    setSearchValue(value);
-    if (typeof window !== 'undefined') {
-      window.dispatchEvent(new CustomEvent('truecast_search', { detail: value }));
-    }
   };
 
   return (
@@ -58,19 +49,6 @@ export default function Navbar() {
           <Link href="/stats" className={styles.navLink}>
             Stats
           </Link>
-          <div className={styles.navSearchContainer}>
-            <div className={styles.navSearchWrapper}>
-              <span className={styles.navSearchIcon}>🔍</span>
-              <input
-                type="text"
-                className={styles.navSearchInput}
-                value={searchValue}
-                onChange={handleSearchChange}
-                placeholder="Search Truecast"
-              />
-              <span className={styles.navSearchShortcut}>/</span>
-            </div>
-          </div>
           <div className={styles.connectButton}>
             <ConnectButton />
           </div>
