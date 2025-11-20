@@ -355,6 +355,11 @@ select.input option {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
 }
 
+.highlightedMarketCard {
+  border-color: #667eea;
+  box-shadow: 0 0 0 2px rgba(102, 126, 234, 0.4), 0 8px 24px rgba(102, 126, 234, 0.25);
+}
+
 .marketHeader {
   margin-bottom: 1.5rem;
 }

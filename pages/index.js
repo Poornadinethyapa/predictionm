@@ -20,6 +20,7 @@ export default function Home() {
   const [searchQuery, setSearchQuery] = useState('');
   const [toast, setToast] = useState(null);
   const [pendingTx, setPendingTx] = useState(null);
+  const [highlightedMarketId, setHighlightedMarketId] = useState(null);
 
   // Create market form state
   const [newQuestion, setNewQuestion] = useState('');
@@ -94,6 +95,20 @@ export default function Home() {
       loadMarkets();
     }
   }, [contract, address, loadMarkets]);
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const marketParam = params.get('market');
+    if (!marketParam) return;
+    const id = parseInt(marketParam, 10);
+    if (Number.isNaN(id)) return;
+    if (markets.some(m => m.id === id)) {
+      setHighlightedMarketId(id);
+      const el = document.getElementById(`market-${id}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+    }
+  }, [markets]);
 
   // Update time remaining every minute
   useEffect(() => {
@@ -116,7 +131,24 @@ export default function Home() {
     setLoading(true);
     try {
       const outcomes = newOutcomes.split(',').map(o => o.trim()).filter(o => o);
+      if (outcomes.length < 2) {
+        showToast('Please provide at least two outcomes', 'error');
+        setLoading(false);
+        return;
+      }
+      const uniqueOutcomes = Array.from(new Set(outcomes));
+      if (uniqueOutcomes.length !== outcomes.length) {
+        showToast('Outcomes must be unique', 'error');
+        setLoading(false);
+        return;
+      }
       const deadline = Math.floor(new Date(newDeadline).getTime() / 1000);
+      const nowTs = Math.floor(Date.now() / 1000);
+      if (!deadline || deadline <= nowTs) {
+        showToast('Deadline must be a future time', 'error');
+        setLoading(false);
+        return;
+      }
       
       const tx = await contract.createMarket(newQuestion, outcomes, deadline);
       setPendingTx(tx.hash);
@@ -863,7 +895,7 @@ export default function Home() {
                   const noProbability = calculateProbability(noStake, totalStake);
 
                   return (
-                    <div key={market.id} className={styles.marketCard}>
+                    <div key={market.id} id={`market-${market.id}`} className={`${styles.marketCard} ${highlightedMarketId === market.id ? styles.highlightedMarketCard : ''}`}>
                       <div className={styles.marketHeader}>
                         <div className={styles.marketHeaderTop}>
                           <h3 className={styles.marketQuestion}>{market.question}</h3>
