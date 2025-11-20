@@ -1046,7 +1046,6 @@ export default function Home() {
                         <div className={styles.marketHeaderText}>
                           <h3 className={styles.marketQuestionCompact}>{market.question}</h3>
                           <div className={styles.marketMetaCompact}>
-                            <span className={styles.marketVolume}>{formatVolume(market.totalStaked)}</span>
                             <span className={styles.marketDeadline}>{formatDate(market.deadline)}</span>
                           </div>
                         </div>
@@ -1054,6 +1053,7 @@ export default function Home() {
                           <div className={styles.gauge} style={{ background: `conic-gradient(#10b981 ${parseFloat(topProb) * 3.6}deg, #334155 0)` }}>
                             <div className={styles.gaugeInner}>{topProb}%</div>
                           </div>
+                          <span className={styles.marketChanceLabel}>chance</span>
                         </div>
                       </div>
 
@@ -1098,9 +1098,12 @@ export default function Home() {
                         </div>
                       )}
 
-                      <div className={styles.marketActionsCompact}>
-                        <button className={styles.iconButton} onClick={() => shareMarket(market.id)} title="Share">🔗</button>
-                        <button className={`${styles.iconButton} ${bookmarks[market.id] ? styles.iconActive : ''}`} onClick={() => toggleBookmark(market.id)} title="Bookmark">🔖</button>
+                      <div className={styles.marketFooterCompact}>
+                        <span className={styles.marketVolume}>{formatVolume(market.totalStaked)}</span>
+                        <div className={styles.marketActionsCompact}>
+                          <button className={styles.iconButton} onClick={() => shareMarket(market.id)} title="Share">🔗</button>
+                          <button className={`${styles.iconButton} ${bookmarks[market.id] ? styles.iconActive : ''}`} onClick={() => toggleBookmark(market.id)} title="Bookmark">🔖</button>
+                        </div>
                       </div>
 
                       {address && userStakes[market.id] && market.outcomes.map((outcome, idx) => 
