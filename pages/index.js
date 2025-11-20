@@ -486,10 +486,6 @@ export default function Home() {
 
   return (
     <div className={styles.container}>
-      <header className={styles.header}>
-        <h1>Truecast</h1>
-      </header>
-
       <div className={styles.filterTabs}>
         <button
           className={`${styles.filterTab} ${statusFilter === 'all' && activeFilter === 'all' ? styles.activeTab : ''}`}
