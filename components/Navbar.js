@@ -43,6 +43,9 @@ export default function Navbar() {
           <Link href="/create" className={styles.navLink}>
             Create Market
           </Link>
+          <Link href="#resolve-section" className={styles.navLink}>
+            Resolve Market
+          </Link>
           <div className={styles.connectButton}>
             <ConnectButton />
           </div>
@@ -68,6 +71,9 @@ export default function Navbar() {
           </Link>
           <Link href="/create" className={styles.mobileNavLink} onClick={toggleMenu}>
             Create Market
+          </Link>
+          <Link href="#resolve-section" className={styles.mobileNavLink} onClick={toggleMenu}>
+            Resolve Market
           </Link>
           <div className={styles.mobileConnectButton}>
             <ConnectButton />
