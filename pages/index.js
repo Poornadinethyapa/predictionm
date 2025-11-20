@@ -23,7 +23,6 @@ export default function Home() {
   const [toast, setToast] = useState(null);
   const [pendingTx, setPendingTx] = useState(null);
   const [highlightedMarketId, setHighlightedMarketId] = useState(null);
-  const searchInputRef = useRef(null);
   const [bookmarks, setBookmarks] = useState({});
 
   // Bet modal state
@@ -121,17 +120,17 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const onKeyDown = (e) => {
-      if (e.key === '/') {
-        const target = e.target;
-        const tag = target && target.tagName ? target.tagName.toLowerCase() : '';
-        if (tag === 'input' || tag === 'textarea' || target?.isContentEditable) return;
-        e.preventDefault();
-        searchInputRef.current?.focus();
+    const handleSearch = (event) => {
+      setSearchQuery(event.detail || '');
+    };
+    if (typeof window !== 'undefined') {
+      window.addEventListener('truecast_search', handleSearch);
+    }
+    return () => {
+      if (typeof window !== 'undefined') {
+        window.removeEventListener('truecast_search', handleSearch);
       }
     };
-    window.addEventListener('keydown', onKeyDown);
-    return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
 
   useEffect(() => {
@@ -489,21 +488,6 @@ export default function Home() {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1>Truecast</h1>
-        <div className={styles.headerActions}>
-          <div className={styles.headerSearchWrapper}>
-            <span className={styles.headerSearchIcon}>🔍</span>
-            <input
-              ref={searchInputRef}
-              type="text"
-              className={styles.headerSearchInput}
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Search Truecast"
-            />
-            <span className={styles.headerShortcutHint}>/</span>
-          </div>
-          <ConnectButton />
-        </div>
       </header>
 
       <div className={styles.filterTabs}>

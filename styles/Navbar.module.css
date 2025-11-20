@@ -43,6 +43,48 @@
   gap: 1.5rem;
 }
 
+.navSearchContainer {
+  flex: 1;
+  max-width: 420px;
+}
+
+.navSearchWrapper {
+  display: flex;
+  align-items: center;
+  background-color: rgba(15, 23, 42, 0.9);
+  border-radius: 999px;
+  padding: 0.35rem 0.75rem;
+  border: 1px solid rgba(148, 163, 184, 0.5);
+}
+
+.navSearchIcon {
+  margin-right: 0.5rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.navSearchInput {
+  flex: 1;
+  background: transparent;
+  border: none;
+  outline: none;
+  color: white;
+  font-size: 0.9rem;
+}
+
+.navSearchInput::placeholder {
+  color: rgba(148, 163, 184, 0.9);
+}
+
+.navSearchShortcut {
+  margin-left: 0.5rem;
+  padding: 0.1rem 0.35rem;
+  border-radius: 0.35rem;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  font-size: 0.7rem;
+  color: rgba(148, 163, 184, 0.9);
+}
+
 .navLink {
   color: rgba(255, 255, 255, 0.8);
   text-decoration: none;
@@ -187,5 +229,9 @@
 @media (min-width: 769px) {
   .mobileMenu {
     display: none;
+  }
+
+  .navSearchContainer {
+    max-width: 360px;
   }
 }
