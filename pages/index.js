@@ -129,15 +129,16 @@ export default function Home() {
     }
   }, [markets]);
 
-  // Update time remaining every minute
+  // Refresh market data every 10 seconds for real-time updates
   useEffect(() => {
-    if (!isConnected) return;
+    if (!isConnected || !contract) return;
+    
     const interval = setInterval(() => {
-      // Force re-render to update time remaining
-      setMarkets(prev => [...prev]);
-    }, 60000); // Update every minute
+      loadMarkets();
+    }, 10000); // Update every 10 seconds
+    
     return () => clearInterval(interval);
-  }, [isConnected]);
+  }, [isConnected, contract, loadMarkets]);
 
   const showToast = (message, type = 'success', txHash = null) => {
     setToast({ message, type, txHash });
