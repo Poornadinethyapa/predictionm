@@ -17,7 +17,7 @@ export default function Home() {
   const [loading, setLoading] = useState(false);
   const [userStakes, setUserStakes] = useState({});
   const [activeFilter, setActiveFilter] = useState('all'); // 'all', 'myBets', 'myMarkets'
-  const [statusFilter, setStatusFilter] = useState('all'); // 'all', 'active', 'resolved', 'expired', 'myMarkets'
+  const [statusFilter, setStatusFilter] = useState('active'); // 'active', 'expired'
   const [sortBy, setSortBy] = useState('newest'); // 'newest', 'deadline', 'totalStaked', 'mostPopular'
   const [searchQuery, setSearchQuery] = useState('');
   const [toast, setToast] = useState(null);
@@ -488,44 +488,14 @@ export default function Home() {
     <div className={styles.container}>
       <div className={styles.filterTabs}>
         <button
-          className={`${styles.filterTab} ${statusFilter === 'all' && activeFilter === 'all' ? styles.activeTab : ''}`}
+          className={`${styles.filterTab} ${statusFilter === 'active' ? styles.activeTab : ''}`}
           onClick={() => {
-            setStatusFilter('all');
+            setStatusFilter('active');
             setActiveFilter('all');
             document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           }}
         >
-          Markets
-        </button>
-        <button
-          className={`${styles.filterTab} ${activeFilter === 'myBets' ? styles.activeTab : ''}`}
-          onClick={() => {
-            setActiveFilter(activeFilter === 'myBets' ? 'all' : 'myBets');
-            setStatusFilter('all');
-            document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-        >
-          My Bets
-        </button>
-        <button
-          className={`${styles.filterTab} ${statusFilter === 'myMarkets' ? styles.activeTab : ''}`}
-          onClick={() => {
-            setStatusFilter('myMarkets');
-            setActiveFilter('all');
-            document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-        >
-          My Markets
-        </button>
-        <button
-          className={`${styles.filterTab} ${statusFilter === 'resolved' ? styles.activeTab : ''}`}
-          onClick={() => {
-            setStatusFilter('resolved');
-            setActiveFilter('all');
-            document.getElementById('markets-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-        >
-          Resolved
+          Active
         </button>
         <button
           className={`${styles.filterTab} ${statusFilter === 'expired' ? styles.activeTab : ''}`}
@@ -536,30 +506,6 @@ export default function Home() {
           }}
         >
           Expired
-        </button>
-        <button
-          className={styles.filterTab}
-          onClick={() => {
-            if (!isConnected) {
-              showToast('Connect wallet to resolve markets', 'error');
-              return;
-            }
-            router.push('/resolve');
-          }}
-        >
-          Resolve
-        </button>
-        <button
-          className={styles.filterTab}
-          onClick={() => {
-            if (!isConnected) {
-              showToast('Connect wallet to view stats', 'info');
-              return;
-            }
-            document.getElementById('stats-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-          }}
-        >
-          Stats
         </button>
       </div>
 
