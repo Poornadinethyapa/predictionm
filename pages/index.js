@@ -21,6 +21,8 @@ export default function Home() {
   const [toast, setToast] = useState(null);
   const [pendingTx, setPendingTx] = useState(null);
   const [highlightedMarketId, setHighlightedMarketId] = useState(null);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const [searchDraft, setSearchDraft] = useState('');
 
   // Create market form state
   const [newQuestion, setNewQuestion] = useState('');
@@ -123,6 +125,25 @@ export default function Home() {
   const showToast = (message, type = 'success', txHash = null) => {
     setToast({ message, type, txHash });
     setTimeout(() => setToast(null), 5000);
+  };
+
+  const openSearch = () => {
+    setSearchDraft(searchQuery);
+    setIsSearchOpen(true);
+  };
+
+  const closeSearch = () => {
+    setIsSearchOpen(false);
+  };
+
+  const submitSearch = (e) => {
+    e.preventDefault();
+    setSearchQuery(searchDraft);
+    setIsSearchOpen(false);
+    const el = document.getElementById('markets-section');
+    if (el) {
+      el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
   };
 
   const createMarket = async (e) => {
@@ -529,7 +550,10 @@ export default function Home() {
     <div className={styles.container}>
       <header className={styles.header}>
         <h1>Truecast</h1>
-        <ConnectButton />
+        <div className={styles.headerActions}>
+          <button className={styles.searchButton} onClick={openSearch} title="Search">🔍</button>
+          <ConnectButton />
+        </div>
       </header>
 
       <div className={styles.filterTabs}>
@@ -1166,6 +1190,31 @@ export default function Home() {
                       <button type="submit" className={styles.submitButton} disabled={loading}>
                         {loading ? 'Placing Bet...' : 'Place Bet'}
                       </button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          )}
+          {isSearchOpen && (
+            <div className={styles.modalOverlay} onClick={closeSearch}>
+              <div className={styles.modal} onClick={(e) => e.stopPropagation()}>
+                <div className={styles.modalHeader}>
+                  <h2>Search Markets</h2>
+                  <button className={styles.closeButton} onClick={closeSearch}>×</button>
+                </div>
+                <div className={styles.modalBody}>
+                  <form onSubmit={submitSearch}>
+                    <input
+                      type="text"
+                      className={styles.searchInput}
+                      value={searchDraft}
+                      onChange={(e) => setSearchDraft(e.target.value)}
+                      placeholder="Search by question or outcome"
+                    />
+                    <div className={styles.modalActions}>
+                      <button type="button" className={styles.cancelButton} onClick={closeSearch}>Cancel</button>
+                      <button type="submit" className={styles.submitButton}>Search</button>
                     </div>
                   </form>
                 </div>
