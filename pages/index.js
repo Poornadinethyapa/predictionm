@@ -22,6 +22,7 @@ export default function Home() {
   const [pendingTx, setPendingTx] = useState(null);
   const [highlightedMarketId, setHighlightedMarketId] = useState(null);
   const searchInputRef = useRef(null);
+  const [bookmarks, setBookmarks] = useState({});
 
   // Create market form state
   const [newQuestion, setNewQuestion] = useState('');
@@ -139,6 +140,28 @@ export default function Home() {
     window.addEventListener('keydown', onKeyDown);
     return () => window.removeEventListener('keydown', onKeyDown);
   }, []);
+
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem('truecast_bookmarks');
+      if (saved) setBookmarks(JSON.parse(saved));
+    } catch {}
+  }, []);
+
+  const toggleBookmark = (id) => {
+    setBookmarks(prev => {
+      const next = { ...prev, [id]: !prev[id] };
+      try { localStorage.setItem('truecast_bookmarks', JSON.stringify(next)); } catch {}
+      return next;
+    });
+  };
+
+  const formatVolume = (eth) => {
+    const n = parseFloat(eth || '0');
+    if (n >= 1000) return `${(n/1000).toFixed(1)}k ETH Vol.`;
+    if (n >= 1) return `${n.toFixed(0)} ETH Vol.`;
+    return `${n.toFixed(2)} ETH Vol.`;
+  };
 
   const createMarket = async (e) => {
     e.preventDefault();
@@ -1011,110 +1034,73 @@ export default function Home() {
                   const totalStake = parseFloat(market.totalStaked || '0');
                   const yesProbability = calculateProbability(yesStake, totalStake);
                   const noProbability = calculateProbability(noStake, totalStake);
+                  const probs = market.outcomes.map((_, idx) => calculateProbability(parseFloat(market.outcomeStakes[idx] || '0'), totalStake));
+                  const topIdx = probs.reduce((maxI, p, i) => parseFloat(p) > parseFloat(probs[maxI]) ? i : maxI, 0);
+                  const topProb = probs[topIdx];
+                  const titleInitial = market.question?.trim()?.charAt(0)?.toUpperCase() || '#';
 
                   return (
-                    <div key={market.id} id={`market-${market.id}`} className={`${styles.marketCard} ${highlightedMarketId === market.id ? styles.highlightedMarketCard : ''}`}>
-                      <div className={styles.marketHeader}>
-                        <div className={styles.marketHeaderTop}>
-                          <h3 className={styles.marketQuestion}>{market.question}</h3>
-                          <button
-                            className={styles.shareButton}
-                            onClick={() => shareMarket(market.id)}
-                            title="Share market"
-                          >
-                            🔗
-                          </button>
+                    <div key={market.id} id={`market-${market.id}`} className={`${styles.marketCardCompact} ${highlightedMarketId === market.id ? styles.highlightedMarketCard : ''}`}>
+                      <div className={styles.marketCardHeaderCompact}>
+                        <div className={styles.marketThumb}>{titleInitial}</div>
+                        <div className={styles.marketHeaderText}>
+                          <h3 className={styles.marketQuestionCompact}>{market.question}</h3>
+                          <div className={styles.marketMetaCompact}>
+                            <span className={styles.marketVolume}>{formatVolume(market.totalStaked)}</span>
+                            <span className={styles.marketDeadline}>{formatDate(market.deadline)}</span>
+                          </div>
                         </div>
-                        <div className={styles.marketMeta}>
-                          <div className={styles.marketBadges}>
-                            {getMarketStatus(market) === 'active' && (
-                              <span className={styles.activeBadge}>Active</span>
-                            )}
-                            {getMarketStatus(market) === 'resolved' && (
-                              <span className={styles.resolvedBadge}>Resolved: {market.outcomes[market.winningOutcome]}</span>
-                            )}
-                            {getMarketStatus(market) === 'expired' && (
-                              <span className={styles.expiredBadge}>Expired</span>
-                            )}
-                            {getMarketStatus(market) === 'active' && getTimeRemaining(market.deadline) && (
-                              <span className={styles.timeRemainingBadge}>
-                                ⏱️ {getTimeRemaining(market.deadline)} left
-                              </span>
-                            )}
+                        <div className={styles.marketChance}>
+                          <div className={styles.gauge} style={{ background: `conic-gradient(#10b981 ${parseFloat(topProb) * 3.6}deg, #334155 0)` }}>
+                            <div className={styles.gaugeInner}>{topProb}%</div>
                           </div>
-                          <div className={styles.marketStats}>
-                            <span className={styles.statItem}>
-                              💰 {parseFloat(market.totalStaked).toFixed(4)} ETH staked
-                            </span>
-                            <span className={styles.statItem}>
-                              📊 {getNumberOfBets(market)} bet{getNumberOfBets(market) !== 1 ? 's' : ''}
-                            </span>
-                          </div>
-                          <span className={styles.deadline}>Deadline: {formatDate(market.deadline)}</span>
                         </div>
                       </div>
 
-                      <div className={styles.votingSection}>
-                        {/* Outcome Buttons - Show first 2 outcomes as Yes/No style only if exactly 2 outcomes */}
-                        {market.outcomes.length === 2 && (
-                          <>
-                            <button
-                              className={`${styles.voteButton} ${styles.yesButton}`}
-                              onClick={() => canBet && openBetModal(market.id, 0)}
-                              disabled={!canBet || loading}
-                            >
-                              <div className={styles.voteButtonContent}>
-                                <span className={styles.voteLabel}>{market.outcomes[0]}</span>
-                                <div className={styles.probabilityDisplay}>
-                                  <span className={styles.probabilityValue}>{yesProbability}%</span>
-                                  <span className={styles.probabilityLabel}>chance</span>
-                                </div>
-                                <div className={styles.stakeAmount}>{yesStake.toFixed(4)} ETH</div>
-                              </div>
-                            </button>
+                      {market.outcomes.length === 2 && (
+                        <div className={styles.outcomesRowCompact}>
+                          <button
+                            className={`${styles.miniOutcome} ${styles.miniYes}`}
+                            onClick={() => canBet && openBetModal(market.id, 0)}
+                            disabled={!canBet || loading}
+                          >
+                            <span>{market.outcomes[0]}</span>
+                            <span className={styles.miniOutcomeValue}>{yesProbability}%</span>
+                          </button>
+                          <button
+                            className={`${styles.miniOutcome} ${styles.miniNo}`}
+                            onClick={() => canBet && openBetModal(market.id, 1)}
+                            disabled={!canBet || loading}
+                          >
+                            <span>{market.outcomes[1]}</span>
+                            <span className={styles.miniOutcomeValue}>{noProbability}%</span>
+                          </button>
+                        </div>
+                      )}
 
-                            <button
-                              className={`${styles.voteButton} ${styles.noButton}`}
-                              onClick={() => canBet && openBetModal(market.id, 1)}
-                              disabled={!canBet || loading}
-                            >
-                              <div className={styles.voteButtonContent}>
-                                <span className={styles.voteLabel}>{market.outcomes[1]}</span>
-                                <div className={styles.probabilityDisplay}>
-                                  <span className={styles.probabilityValue}>{noProbability}%</span>
-                                  <span className={styles.probabilityLabel}>chance</span>
-                                </div>
-                                <div className={styles.stakeAmount}>{noStake.toFixed(4)} ETH</div>
-                              </div>
-                            </button>
-                          </>
-                        )}
-                        {/* For markets with more than 2 outcomes, use neutral colors */}
-                        {market.outcomes.length > 2 && (
-                          <div className={styles.multipleOutcomes}>
-                            {market.outcomes.map((outcome, idx) => {
-                              const stake = parseFloat(market.outcomeStakes[idx] || '0');
-                              const probability = calculateProbability(stake, totalStake);
-                              return (
-                                <button
-                                  key={idx}
-                                  className={`${styles.voteButton} ${styles.additionalButton}`}
-                                  onClick={() => canBet && openBetModal(market.id, idx)}
-                                  disabled={!canBet || loading}
-                                >
-                                  <div className={styles.voteButtonContent}>
-                                    <span className={styles.voteLabel}>{outcome}</span>
-                                    <div className={styles.probabilityDisplay}>
-                                      <span className={styles.probabilityValue}>{probability}%</span>
-                                      <span className={styles.probabilityLabel}>chance</span>
-                                    </div>
-                                    <div className={styles.stakeAmount}>{stake.toFixed(4)} ETH</div>
-                                  </div>
-                                </button>
-                              );
-                            })}
-                          </div>
-                        )}
+                      {market.outcomes.length > 2 && (
+                        <div className={styles.outcomesColumnCompact}>
+                          {market.outcomes.map((outcome, idx) => {
+                            const stake = parseFloat(market.outcomeStakes[idx] || '0');
+                            const probability = calculateProbability(stake, totalStake);
+                            return (
+                              <button
+                                key={idx}
+                                className={`${styles.miniOutcome} ${styles.miniNeutral}`}
+                                onClick={() => canBet && openBetModal(market.id, idx)}
+                                disabled={!canBet || loading}
+                              >
+                                <span>{outcome}</span>
+                                <span className={styles.miniOutcomeValue}>{probability}%</span>
+                              </button>
+                            );
+                          })}
+                        </div>
+                      )}
+
+                      <div className={styles.marketActionsCompact}>
+                        <button className={styles.iconButton} onClick={() => shareMarket(market.id)} title="Share">🔗</button>
+                        <button className={`${styles.iconButton} ${bookmarks[market.id] ? styles.iconActive : ''}`} onClick={() => toggleBookmark(market.id)} title="Bookmark">🔖</button>
                       </div>
 
                       {address && userStakes[market.id] && market.outcomes.map((outcome, idx) => 
